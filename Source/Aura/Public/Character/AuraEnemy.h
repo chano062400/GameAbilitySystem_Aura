@@ -10,7 +10,7 @@
  * 
  */
 UCLASS()
-class AURA_API AAuraEnemy : public AAuraCharacterBase
+class AURA_API AAuraEnemy : public AAuraCharacterBase, public IEnemyInterface
 {
 	GENERATED_BODY()
 
@@ -24,4 +24,12 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool bHightlight = false;
+
+protected:
+
+	virtual void BeginPlay() override;
+
+private:
+
+
 };
