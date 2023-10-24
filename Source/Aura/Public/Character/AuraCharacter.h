@@ -4,6 +4,9 @@
 #include "Character/AuraCharacterBase.h"
 #include "AuraCharacter.generated.h"
 
+
+class AAuraPlayerController;
+class AAuraHUD;
 /**
  * 
  */

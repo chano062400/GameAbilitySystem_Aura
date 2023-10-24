@@ -19,9 +19,10 @@ void AAuraPlayerController::BeginPlay()
 	check(AuraMappingContext); // AuraMappingContext가 nullptr이면 실행 중단.
 
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	check(Subsystem);
-
-	Subsystem->AddMappingContext(AuraMappingContext, 0);
+	if (Subsystem)
+	{
+		Subsystem->AddMappingContext(AuraMappingContext, 0);
+	}
 
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Default;
@@ -65,7 +66,7 @@ void AAuraPlayerController::CursorTrace()
 	if (!CursorHit.bBlockingHit) return;
 
 	LastActor = ThisActor;
-	ThisActor = Cast<IEnemyInterface>(CursorHit.GetActor());
+	ThisActor = TScriptInterface<IEnemyInterface>(CursorHit.GetActor());
 
 	/* 
 	   1. LastActor , ThisActor 모두 nullptr - Do Nothing

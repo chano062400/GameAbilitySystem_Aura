@@ -7,6 +7,10 @@
 #include "InputActionValue.h"
 #include "AuraPlayerController.generated.h"
 
+class UInputAction;
+class UInputMappingContext;
+class IEnemyInterface;
+
 /**
  * 
  */
@@ -34,12 +38,14 @@ protected:
 private:
 
 	UPROPERTY(EditAnywhere, Category ="Input")
-	TObjectPtr<class UInputMappingContext> AuraMappingContext;
+	TObjectPtr<UInputMappingContext> AuraMappingContext;
 
 	UPROPERTY(EditAnywhere, Category = "Input")
-	TObjectPtr<class UInputAction> MoveAction;
+	TObjectPtr<UInputAction> MoveAction;
 	
-	class IEnemyInterface* LastActor;
+	UPROPERTY()
+	TScriptInterface<IEnemyInterface> LastActor;
 
-	IEnemyInterface* ThisActor;
+	UPROPERTY()
+	TScriptInterface<IEnemyInterface> ThisActor;
 };
