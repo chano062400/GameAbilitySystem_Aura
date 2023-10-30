@@ -32,7 +32,7 @@ void AAuraEffectActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGam
 		EffectContextHandle.AddSourceObject(this); // Gameplay Context관련 항목을 저장하는 기능.  이 객체가 무슨 효과를 일으켰는지 SourceObject를 통해 확인 가능해짐.
 		
 		// SpecHandle이지만 보통 Spec으로 변수명을 지으니 유형 확인해볼 것, 똑같이 GameplayEffectSpec을 저장하는 LightWrapper임.
-		FGameplayEffectSpecHandle EffectSpecHandle = TargetABSC->MakeOutgoingSpec(GameplayEffectClass, 1.f, EffectContextHandle); 
+		FGameplayEffectSpecHandle EffectSpecHandle = TargetABSC->MakeOutgoingSpec(GameplayEffectClass, ActorLevel, EffectContextHandle); 
 		const FActiveGameplayEffectHandle ActiveEffectHandle = TargetABSC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get()); // Data는 스마트포인터. Get()을 통해 raw Pointer로 가져옴 / 매개변수가 참조형식이라 값을 가져와서 넣어야 함(*EffectSpecHandle.Data.Get())
 	
 		// EffectSpecHandle.Data.Get()->Def - GameplayEffect 그 자체를 뜻함. .Get() - 원시포인터를 받아옴.
@@ -69,7 +69,7 @@ void AAuraEffectActor::EndOverlap(AActor* TargetActor)
 {
 	if (InstantEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnEndOverlap)
 	{
-		ApplyEffectToTarget(TargetActor, InstantGameplayEffectClass);
+ 	ApplyEffectToTarget(TargetActor, InstantGameplayEffectClass);
 	}
 
 	if (DurationEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnEndOverlap)
