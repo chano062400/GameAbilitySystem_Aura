@@ -23,7 +23,7 @@ void UAuraAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME_CONDITION_NOTIFY(UAuraAttributeSet, MaxMana, COND_None, REPNOTIFY_Always);
 }
 
-void UAuraAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
+void UAuraAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) // CurrentValue에 영향.
 {
 	Super::PreAttributeChange(Attribute, NewValue);
 	
@@ -51,6 +51,16 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	FEffectProperties EffectProperties;
 	
 	SetEffectProperties(Data, EffectProperties);
+
+	//if (Data.EvaluatedData.Attribute == GetHealthAttribute()) // 변경된 값이 Health라면
+	//{
+	//	SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
+	//}
+
+	//if (Data.EvaluatedData.Attribute == GetManaAttribute())
+	//{
+	//	SetMana(FMath::Clamp(GetMana(), 0.f, GetMaxMana()));
+	//}
 
 }
 

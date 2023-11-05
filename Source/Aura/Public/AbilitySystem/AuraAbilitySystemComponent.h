@@ -6,6 +6,8 @@
 #include "AbilitySystemComponent.h"
 #include "AuraAbilitySystemComponent.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FEffectAssetTags, const FGameplayTagContainer& /*AssetTags*/);
+
 /**
  * 
  */
@@ -17,6 +19,8 @@ class AURA_API UAuraAbilitySystemComponent : public UAbilitySystemComponent
 public:
 	
 	void AbilityActorInfoSet(); // AbilityActorInfo가 Set됐을 때 호출.
+
+	FEffectAssetTags EffectAssetTags;
 
 protected:
 
