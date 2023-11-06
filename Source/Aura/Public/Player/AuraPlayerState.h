@@ -26,7 +26,7 @@ protected:
 
 	// Player¿ë AbilitySystem, AttributeSet
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UAbilitySystemComponent> AbilitySystemComponent;
 
 	UPROPERTY()

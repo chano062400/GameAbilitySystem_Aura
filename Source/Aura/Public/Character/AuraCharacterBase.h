@@ -6,6 +6,9 @@
 #include "Interaction/EnemyInterface.h"
 #include "AuraCharacterBase.generated.h"
 
+class UAttributeSet;
+class UGameplayEffect;
+
 UCLASS(Abstract)
 class AURA_API AAuraCharacterBase : public ACharacter, public IAbilitySystemInterface
 {
@@ -37,7 +40,12 @@ protected:
 	TObjectPtr< UAbilitySystemComponent> AbilitySystemComponent;
 
 	UPROPERTY()
-	TObjectPtr<class UAttributeSet> AttributeSet;
+	TObjectPtr<UAttributeSet> AttributeSet;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
+	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
+
+	void InitializePrimaryAttributes() const;
 
 private:
 

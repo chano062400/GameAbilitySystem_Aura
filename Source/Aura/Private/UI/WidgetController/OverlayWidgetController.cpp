@@ -68,9 +68,7 @@ void UOverlayWidgetController::BindCallbacksToDependencies() // Attribute가 변경
 				{
 					//Lamba함수는 전역함수는 바로 사용할 수 있지만, 멤버함수는 []안에 해당 멤버함수의 클래스 캡처를 해야 사용 가능.(this)
 					const FUIWidgetRow* Row = GetDataTableRowByTag<FUIWidgetRow>(MessageWidgetTable, Tag);
-					MessageWidgetRowDelegate.Broadcast(*Row);
-					
-					 
+					MessageWidgetRowDelegate.Broadcast(*Row); 
 				}
 			}
 		}
