@@ -8,9 +8,7 @@
 UAuraAttributeSet::UAuraAttributeSet()
 {
 	InitHealth(1.f);
-	InitMaxHealth(100.f);
 	InitMana(25.f);
-	InitMaxMana(50.f);
 }
 
 void UAuraAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -68,15 +66,15 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	
 	SetEffectProperties(Data, EffectProperties);
 
-	//if (Data.EvaluatedData.Attribute == GetHealthAttribute()) // 변경된 값이 Health라면
-	//{
-	//	SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
-	//}
+	if (Data.EvaluatedData.Attribute == GetHealthAttribute()) // 변경된 값이 Health라면
+	{
+		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
+	}
 
-	//if (Data.EvaluatedData.Attribute == GetManaAttribute())
-	//{
-	//	SetMana(FMath::Clamp(GetMana(), 0.f, GetMaxMana()));
-	//}
+	if (Data.EvaluatedData.Attribute == GetManaAttribute())
+	{
+		SetMana(FMath::Clamp(GetMana(), 0.f, GetMaxMana()));
+	}
 
 }
 
