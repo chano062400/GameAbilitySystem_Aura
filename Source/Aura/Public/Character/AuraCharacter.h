@@ -23,6 +23,10 @@ public:
 
 	virtual void OnRep_PlayerState() override;
 
+	/* Combat interface */
+
+	virtual int32 GetPlayerLevel() override;
+
 protected:
 
 
