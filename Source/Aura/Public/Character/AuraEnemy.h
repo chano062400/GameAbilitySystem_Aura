@@ -6,6 +6,8 @@
 #include "Character/AuraCharacterBase.h"
 #include "AuraEnemy.generated.h"
 
+class UBehaviorTree;
+class AAuraAIController;
 /**
  * 
  */
@@ -17,6 +19,8 @@ class AURA_API AAuraEnemy : public AAuraCharacterBase, public IEnemyInterface
 public:
 
 	AAuraEnemy();
+
+	virtual void PossessedBy(AController* NewController) override;
 
 	/* Enemy Interface */
 	
@@ -39,6 +43,13 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Class Defauls")
 		int32 Level = 1;
+
+	UPROPERTY(EditAnywhere, Category = "AI")
+	TObjectPtr<UBehaviorTree> BehaviorTree;
+
+	UPROPERTY()
+	TObjectPtr<AAuraAIController> AuraAIController;
+
 private:
 
 
