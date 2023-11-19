@@ -1,6 +1,7 @@
 #include "UI/HUD/AuraHUD.h"
 #include "UI/Widgets/AuraUserWidget.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
+#include "UI/WidgetController/AttributeMenuWidgetController.h"
 
 //OverlayWidgetController가 생성되지 않았다면 생성하고, 생성돼있다면 포인터를 반환.
 UOverlayWidgetController* AAuraHUD::GetOverlayWidgetController(const FWidgetControllerParams& WCParams)
@@ -17,6 +18,20 @@ UOverlayWidgetController* AAuraHUD::GetOverlayWidgetController(const FWidgetCont
 	return OverlayWidgetController;
 }
 
+UAttributeMenuWidgetController* AAuraHUD::GetAttributeMenuWidgetController(const FWidgetControllerParams& WCParams)
+{
+	if (AttributeMenuWidgetController == nullptr)
+	{
+		AttributeMenuWidgetController = NewObject<UAttributeMenuWidgetController>(this, AttributeMenuWidgetControllerClass);
+		AttributeMenuWidgetController->SetWidgetControllerParams(WCParams);
+		AttributeMenuWidgetController->BindCallbacksToDependencies();
+
+		return AttributeMenuWidgetController;
+	}
+
+	return AttributeMenuWidgetController;
+}
+
 //UserWidget을 생성하고, 해당 WidgetController까지 모두 구성하고 OverlayWidget의 OverlayWidgetController를 설정. 
 void AAuraHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS)
 {
@@ -25,13 +40,12 @@ void AAuraHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySyst
 
 	UUserWidget* Widget = CreateWidget<UUserWidget>(GetWorld(), OverlayWidgetClass);
 	OverlayWidget = Cast<UAuraUserWidget>(Widget);
-	
+
 	const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, AS);
 	UOverlayWidgetController* WidgetController = GetOverlayWidgetController(WidgetControllerParams);
-	
+
 	OverlayWidget->SetWidgetController(WidgetController);
 	OverlayWidgetController->BroadcastInitialValues();
-
 
 	Widget->AddToViewport();
 }
