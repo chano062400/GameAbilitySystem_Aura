@@ -39,6 +39,11 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 		FName("Attributes.Secondary.ArmorPenetration"), 
 		FString("Ignored Percentage of enemy Armor, Increases Critical Hit Chance")
 	); 
+	
+	GameplayTags.Attributes_Secondary_ArmorPenetration = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attributes.Secondary.BlockChance"), 
+		FString("Increases Chance of Block")
+	); 
 
 	GameplayTags.Attributes_Secondary_CriticalHitChance = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Attributes.Secondary.CriticalHitChance"),
