@@ -3,6 +3,7 @@
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "AbilitySystem/Data/AttributeInfo.h"
 #include "AuraGameplayTags.h"
+#include "AbilitySystem/AuraAttributeSet.h"
 
 void UAttributeMenuWidgetController::BroadcastInitialValues()
 {
@@ -10,13 +11,27 @@ void UAttributeMenuWidgetController::BroadcastInitialValues()
 	check(AS);
 	check(AttributeInfo);
 
-	FAuraAttributeInfo Info = AttributeInfo->FindAttributeInfoForTag(FAuraGameplayTags::Get().Attributes_Primary_Strength);
-
-	Info.AttributeValue = AS->GetStrength();
-	AttributeInfoDelegate.Broadcast(Info);
+	for (auto& Pair : AS->TagsToAttributes)
+	{
+		FAuraAttributeInfo Info = AttributeInfo->FindAttributeInfoForTag(Pair.Key);
+		Info.AttributeValue = Pair.Value().GetNumericValue(AS); // Execute해서 반환 값을 받아옴.
+		AttributeInfoDelegate.Broadcast(Info);
+	}
 }
 
 void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 {
-	
+	UAuraAttributeSet* AS = CastChecked<UAuraAttributeSet>(AttributeSet);
+
+	for (auto& Pair : AS->TagsToAttributes)
+	{
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Pair.Value()).AddLambda(
+			[this, Pair, AS](const FOnAttributeChangeData& Data)
+			{
+				FAuraAttributeInfo Info = AttributeInfo->FindAttributeInfoForTag(Pair.Key);
+				Info.AttributeValue = Data.NewValue;
+				AttributeInfoDelegate.Broadcast(Info);
+			}
+		);
+	}
 }
