@@ -28,6 +28,8 @@ void AAuraCharacter::PossessedBy(AController* NewController) // 서버
 
 	InitAbilityActorInfo();
 
+	AddCharacterAbilities();
+
 }
 
 void AAuraCharacter::OnRep_PlayerState() // 클라이언트

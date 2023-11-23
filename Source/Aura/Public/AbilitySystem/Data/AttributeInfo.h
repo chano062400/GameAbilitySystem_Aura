@@ -4,10 +4,11 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "GameplayTagContainer.h"
+#include "Engine/DataTable.h"
 #include "AttributeInfo.generated.h"
 
 USTRUCT(BlueprintType)
-struct FAuraAttributeInfo
+struct FAuraAttributeInfo : public FTableRowBase
 {
 	GENERATED_BODY()
 
