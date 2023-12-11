@@ -13,6 +13,7 @@ class UInputMappingContext;
 class IEnemyInterface;
 class UAuraInputConfig;
 class UAuraAbilitySystemComponent;
+class USplineComponent;
 
 /**
  * 
@@ -52,6 +53,8 @@ private:
 	UPROPERTY()
 	TScriptInterface<IEnemyInterface> ThisActor;
 
+	FHitResult CursorHit;
+
 	void AbilityInputTagPressed(FGameplayTag InputTag);
 	
 	void AbilityInputTagReleased(FGameplayTag InputTag);
@@ -65,4 +68,22 @@ private:
 	TObjectPtr<UAuraAbilitySystemComponent> AuraAbilitySystemComponent;
 
 	UAuraAbilitySystemComponent* GetASC();
+
+	FVector CachedDestination = FVector::ZeroVector;
+
+	float FollowTime = 0.f;
+
+	float ShortPressThreshold = 0.5f; // 0.5초 미만으로 클릭했다면 FollowTime은 0으로 초기화.
+
+	bool bAutoRunning = false;
+
+	bool bTargeting = false;
+
+	UPROPERTY(EditDefaultsOnly)
+	float AutoRunAcceptanceRadius = 50.f;
+
+	UPROPERTY(VisibleAnywhere)
+		TObjectPtr<USplineComponent> Spline;
+
+	void AutoRun();
 };
