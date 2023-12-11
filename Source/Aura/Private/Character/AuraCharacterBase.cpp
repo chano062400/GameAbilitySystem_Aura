@@ -2,6 +2,7 @@
 #include "DrawDebugHelpers.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
+#include "Engine/SkeletalMeshSocket.h"
 
 AAuraCharacterBase::AAuraCharacterBase()
 {
@@ -36,6 +37,12 @@ void AAuraCharacterBase::BeginPlay()
 void AAuraCharacterBase::InitAbilityActorInfo()
 {
 
+}
+
+FVector AAuraCharacterBase::GetCombatSocketLocation()
+{
+	check(Weapon);
+	return Weapon->GetSocketLocation(WeaponTipSocketName);
 }
 
 void AAuraCharacterBase::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const

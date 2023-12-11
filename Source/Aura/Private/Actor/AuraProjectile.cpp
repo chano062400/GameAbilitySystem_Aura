@@ -1,9 +1,11 @@
 #include "Actor/AuraProjectile.h"
 #include "Components/SphereComponent.h"
-
+#include "GameFramework/ProjectileMovementComponent.h"
+	
 AAuraProjectile::AAuraProjectile()
 {
 	PrimaryActorTick.bCanEverTick = false;
+	bReplicates = true;
 
 	Sphere = CreateDefaultSubobject<USphereComponent>("Sphere");
 	SetRootComponent(Sphere);
@@ -14,8 +16,10 @@ AAuraProjectile::AAuraProjectile()
 	Sphere->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap);
 	Sphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 
-	ProjectileMovement
-
+	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovement");
+	ProjectileMovement->InitialSpeed = 550.f;
+	ProjectileMovement->MaxSpeed = 550.f;
+	ProjectileMovement->ProjectileGravityScale = 0.f; //중력영향X
 }
 
 void AAuraProjectile::BeginPlay()

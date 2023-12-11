@@ -26,7 +26,6 @@ public:
 	
 	void AbilityInputTagReleased(const FGameplayTag& InputTag);
 
-
 protected:
 
 	UFUNCTION(Client, Reliable)
