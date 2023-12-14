@@ -50,6 +50,8 @@ void AAuraPlayerController::SetupInputComponent()
 	UAuraInputComponent* AuraInputComponent = CastChecked<UAuraInputComponent>(InputComponent); // CastChecked에 Assertion과정이 있어서 따로 check 안해줘도 됨.
 
 	AuraInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAuraPlayerController::Move);
+	AuraInputComponent->BindAction(ShiftAction, ETriggerEvent::Started, this, &AAuraPlayerController::ShiftPressed);
+	AuraInputComponent->BindAction(ShiftAction, ETriggerEvent::Canceled, this, &AAuraPlayerController::ShiftReleased);
 	AuraInputComponent->BindAbilityActions(InputConfig, this, &AAuraPlayerController::AbilityInputTagPressed, &AAuraPlayerController::AbilityInputTagReleased, &AAuraPlayerController::AbilityInputTagHeld);
 }
 
@@ -128,14 +130,12 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 		return;
 	}
 
-	if (bTargeting) // Enemy에 왼쪽 마우스 클릭한 경우(공격, 스킬)
-	{
-		if (GetASC()) GetASC()->AbilityInputTagReleased(InputTag);
-	}
-	else 
+	if (GetASC()) GetASC()->AbilityInputTagReleased(InputTag); // targeting 했거나, Shift를 누르고 클릭하고 뗐을 때 
+
+	if (!bTargeting && !bShiftKeyPressed) // Targeting 하지 않고 , Shift를 누르지 않았을 때-> 이동 
 	{
 		const APawn* ControlledPawn = GetPawn();
-		if (ControlledPawn && FollowTime <= ShortPressThreshold) 
+		if (ControlledPawn && FollowTime <= ShortPressThreshold)
 		{
 			if (UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(this, ControlledPawn->GetActorLocation(), CachedDestination))
 			{
@@ -167,7 +167,7 @@ void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 		return;
 	}
 
-	if (bTargeting) // Enemy에 왼쪽 마우스 클릭한 경우(공격, 스킬)
+	if (bTargeting || bShiftKeyPressed) // Enemy에 왼쪽 마우스 클릭한 경우(공격, 스킬) or Shift키를 누르고 왼쪽 마우스 클릭한 경우
 	{
 		if (GetASC()) GetASC()->AbilityInputTagHeld(InputTag);
 	}

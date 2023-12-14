@@ -11,7 +11,7 @@ void UAuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 	
 }
 
-void UAuraProjectileSpell::SpawnProjectile()
+void UAuraProjectileSpell::SpawnProjectile(const FVector& TargetLocation)
 {
 	const bool bIsServer = GetAvatarActorFromActorInfo()->HasAuthority();
 
@@ -22,10 +22,12 @@ void UAuraProjectileSpell::SpawnProjectile()
 	{
 		const FVector SocketLocation = CombatInterface->GetCombatSocketLocation();
 
-		// To Do (발사체 회전 설정)
+		FRotator Rotation = (TargetLocation - SocketLocation).Rotation(); //발사 방향
+		Rotation.Pitch = 0.f; //지면과 평행하게 가도록.
 
 		FTransform SpawnTransform;
-		SpawnTransform.SetLocation(SocketLocation);
+		SpawnTransform.SetLocation(SocketLocation); // 스폰위치 설정
+		SpawnTransform.SetRotation(Rotation.Quaternion()); //스폰방향 설정.
 
 		//SpawnActor함수는 지정한 오브젝트의 인스턴스(객체)를 생성하고 월드에 배치하는 반면,
 		//SpawnActorDeffered함수는 원하는 오브젝트의 객체를 생성하고 액터의 FinishSpawning함수를 호출 할 때에만 월드에 배치한다.

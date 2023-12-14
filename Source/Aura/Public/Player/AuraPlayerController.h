@@ -46,6 +46,15 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> MoveAction;
+	
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<UInputAction> ShiftAction;
+
+	void ShiftPressed() { bShiftKeyPressed = true; }
+
+	void ShiftReleased() { bShiftKeyPressed = false; }
+
+	bool bShiftKeyPressed;
 
 	UPROPERTY()
 	TScriptInterface<IEnemyInterface> LastActor;
