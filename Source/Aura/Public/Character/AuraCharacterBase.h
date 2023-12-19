@@ -28,6 +28,7 @@ public:
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	class UAttributeSet* GetAttributeSet() const { return AttributeSet; }
+
 protected:
 
 	virtual void BeginPlay() override;

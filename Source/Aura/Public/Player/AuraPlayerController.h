@@ -54,6 +54,7 @@ private:
 
 	void ShiftReleased() { bShiftKeyPressed = false; }
 
+	UPROPERTY(EditAnywhere)
 	bool bShiftKeyPressed;
 
 	UPROPERTY()
