@@ -6,6 +6,7 @@
 #include "Character/AuraCharacterBase.h"
 #include "Interaction/EnemyInterface.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
+#include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "AuraEnemy.generated.h"
 
 class UBehaviorTree;
@@ -51,8 +52,13 @@ protected:
 
 	virtual void InitAbilityActorInfo() override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Class Defauls")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Defaults")
 		int32 Level = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Defaults")
+	ECharacterClass CharacterClass = ECharacterClass::Warrior;
+
+	virtual void InitializeDefaultAttributes() const override;
 
 	UPROPERTY(EditAnywhere, Category = "AI")
 	TObjectPtr<UBehaviorTree> BehaviorTree;
