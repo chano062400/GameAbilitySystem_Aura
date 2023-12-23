@@ -4,6 +4,8 @@
 #include "Interaction/CombatInterface.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "AbilitySystemComponent.h"
+#include "Aura/Public/AuraGameplayTags.h"
+#include "AbilitySystemBlueprintLibrary.h"
 
 void UAuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
@@ -41,6 +43,11 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& TargetLocation)
 
 		const UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo();
 		const FGameplayEffectSpecHandle EffectSpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), SourceASC->MakeEffectContext());
+		
+		FAuraGameplayTags AuraGameplayTag = FAuraGameplayTags::Get();
+		const float ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel()); // AbilityLevel에 맞는 Curve 값을 반환.
+		GEngine->AddOnScreenDebugMessage(2, 3.f, FColor::Black, FString::Printf(TEXT("Damage = %f"), ScaledDamage));
+		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(EffectSpecHandle, AuraGameplayTag.Damage, ScaledDamage);
 		AuraProjectile->DamageEffectSpecHandle = EffectSpecHandle;
 
 		AuraProjectile->FinishSpawning(SpawnTransform);
