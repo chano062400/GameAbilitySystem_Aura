@@ -11,6 +11,7 @@
 #include "Components/WidgetComponent.h"
 #include "UI/Widgets/AuraUserWidget.h"
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
+#include "Aura/Public/AuraGameplayTags.h"
 
 AAuraEnemy::AAuraEnemy()
 {
@@ -68,6 +69,10 @@ void AAuraEnemy::BeginPlay()
 
 	InitAbilityActorInfo();
 
+	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+
+	UAuraAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
+
 	//WidgetController는 UObject클래스라서 AuraEnemy Class로 설정 가능.
 	if (UAuraUserWidget* AuraUserWidget = Cast<UAuraUserWidget>(HealthBarWidget->GetUserWidgetObject()))
 	{
@@ -91,10 +96,21 @@ void AAuraEnemy::BeginPlay()
 			}
 		);
 
+		//GameplayTag가 Add or Remove 될 때 Register하고 FOnGameplayEffectTagCountChanged Delegate를 반환함.
+		//DECLARE_MULTICAST_DELEGATE_TwoParams(FOnGameplayEffectTagCountChanged, const FGameplayTag, int32);
+		AbilitySystemComponent->RegisterGameplayTagEvent(FAuraGameplayTags::Get().Effect_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(
+			this, &AAuraEnemy::HitReactTagChanged);
+
 		//초기값 Broadcast
 		OnHealthChanged.Broadcast(AS->GetHealth());
 		OnMaxHealthChanged.Broadcast(AS->GetMaxHealth());
 	}
+}
+
+void AAuraEnemy::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	bHitReacting = NewCount > 0;
+	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
 }
 
 void AAuraEnemy::InitAbilityActorInfo()

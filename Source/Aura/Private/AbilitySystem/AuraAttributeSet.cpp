@@ -105,6 +105,12 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
 
 			const bool bFatal = NewHealth <= 0.f;
+			if (!bFatal)
+			{
+				FGameplayTagContainer TagContainer;
+				TagContainer.AddTag(FAuraGameplayTags::Get().Effect_HitReact);
+				EffectProperties.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+			}
 		}
 	}
 
@@ -196,12 +202,12 @@ void UAuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData
 
 	Props.EffectContextHandle = Data.EffectSpec.GetContext();
 
-	Props.SourceABSC = Props.EffectContextHandle.GetOriginalInstigatorAbilitySystemComponent(); //Gameplay Effect를 유발한 AbilitySystem반환.
+	Props.SourceASC = Props.EffectContextHandle.GetOriginalInstigatorAbilitySystemComponent(); //Gameplay Effect를 유발한 AbilitySystem반환.
 
-	if (IsValid(Props.SourceABSC) && Props.SourceABSC->AbilityActorInfo.IsValid() && Props.SourceABSC->AbilityActorInfo->AvatarActor.IsValid())
+	if (IsValid(Props.SourceASC) && Props.SourceASC->AbilityActorInfo.IsValid() && Props.SourceASC->AbilityActorInfo->AvatarActor.IsValid())
 	{
-		Props.SourceAvatarActor = Props.SourceABSC->AbilityActorInfo->AvatarActor.Get();
-		const AController* SourceController = Props.SourceABSC->AbilityActorInfo->PlayerController.Get();
+		Props.SourceAvatarActor = Props.SourceASC->AbilityActorInfo->AvatarActor.Get();
+		const AController* SourceController = Props.SourceASC->AbilityActorInfo->PlayerController.Get();
 
 		if (Props.SourceController == nullptr && Props.SourceAvatarActor != nullptr) // Controller가 설정이 안돼있다면 설정.
 		{
@@ -225,7 +231,7 @@ void UAuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData
 
 		Props.TargetCharacter = Cast<ACharacter>(Props.TargetAvatarActor);
 
-		Props.TargetABSC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Props.TargetAvatarActor);
+		Props.TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Props.TargetAvatarActor);
 	}
 
 }
