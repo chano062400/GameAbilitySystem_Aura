@@ -5,6 +5,7 @@
 #include "AbilitySystemInterface.h"
 #include "Interaction/EnemyInterface.h"
 #include "Interaction/CombatInterface.h"
+#include "Components/TimelineComponent.h"
 #include "AuraCharacterBase.generated.h"
 
 class UAttributeSet;
@@ -30,6 +31,11 @@ public:
 	class UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override { return HitReactMontage; }
+
+	virtual void Die() override;
+
+	UFUNCTION(NetMulticast, Reliable)
+	virtual void MulticastHandleDeath();
 
 protected:
 
@@ -71,8 +77,36 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TObjectPtr<UAnimMontage> HitReactMontage;
 
+	/* Dissolv Effect */
+
+	void Dissolve();
+
+	UFUNCTION()
+	void UpdateDissolve(float DeltaTime);
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UCurveFloat> DissolveCurve;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UMaterialInstanceDynamic> DynamicDissolveMI;
+
+	TObjectPtr<UTimelineComponent> DissolveTimeline;
+
+	FOnTimelineFloat DissolveTimelineUpdate;
+
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UMaterialInstance> DissolveMI;
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UMaterialInstanceDynamic> WeaponDynamicDissolveMI;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UMaterialInstance> WeaponDissolveMI;
+
 private:
 
 	UPROPERTY(EditAnywhere, Category = "Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities; // 게임 시작시 부여되는 능력.
+
 };

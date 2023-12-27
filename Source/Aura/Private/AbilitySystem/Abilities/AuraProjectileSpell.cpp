@@ -45,7 +45,7 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& TargetLocation)
 		const FGameplayEffectSpecHandle EffectSpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), SourceASC->MakeEffectContext());
 		
 		FAuraGameplayTags AuraGameplayTag = FAuraGameplayTags::Get();
-		const float ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel()); // AbilityLevel에 맞는 Curve 값을 반환.
+		const float ScaledDamage = Damage.GetValueAtLevel(20); // AbilityLevel에 맞는 Curve 값을 반환.
 		GEngine->AddOnScreenDebugMessage(2, 3.f, FColor::Black, FString::Printf(TEXT("Damage = %f"), ScaledDamage));
 		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(EffectSpecHandle, AuraGameplayTag.Damage, ScaledDamage);
 		AuraProjectile->DamageEffectSpecHandle = EffectSpecHandle;
