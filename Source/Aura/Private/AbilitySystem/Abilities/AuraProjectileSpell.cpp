@@ -42,7 +42,24 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& TargetLocation)
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 		const UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo();
-		const FGameplayEffectSpecHandle EffectSpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), SourceASC->MakeEffectContext());
+		FGameplayEffectContextHandle EffectContextHandle = SourceASC->MakeEffectContext();
+		
+		//AbilityInstanceNotReplicated, AbilityCDO, AbilityLevel 설정.
+		EffectContextHandle.SetAbility(this);
+		
+		EffectContextHandle.AddSourceObject(AuraProjectile);
+		
+		TArray<TWeakObjectPtr<AActor>> Actors;
+		Actors.Add(AuraProjectile);
+		EffectContextHandle.AddActors(Actors);
+		
+		FHitResult HitResult;
+		HitResult.Location = TargetLocation;
+		EffectContextHandle.AddHitResult(HitResult);
+
+
+
+		const FGameplayEffectSpecHandle EffectSpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), EffectContextHandle);
 		
 		FAuraGameplayTags AuraGameplayTag = FAuraGameplayTags::Get();
 		const float ScaledDamage = Damage.GetValueAtLevel(20); // AbilityLevel에 맞는 Curve 값을 반환.
