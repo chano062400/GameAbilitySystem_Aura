@@ -4,6 +4,8 @@
 #include "Aura/Public/AuraGameplayTags.h"
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "Interaction/CombatInterface.h"
+#include "AuraAbilityTypes.h"
+#include "AbilitySystem/AuraAbilitySystemGlobals.h"
 
 //Raw Struct라서 Blueprint나 Reflection System 어느 곳에도 노출시키지 않을 것이라서 F 안붙임.
 struct AuraDamagestatics
@@ -77,6 +79,9 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 
 	//1 ~ 100 랜덤 값보다 Target의 BlockChange가 크다면 Block에 성공.
 	const bool bBlocked = FMath::RandRange(1, 100) < TargetBlockChance;
+	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
+	UAuraAbilitySystemLibrary::SetIsBlockedHit(EffectContextHandle, bBlocked);
+
 	Damage = bBlocked ? Damage / 2.f : Damage;
 
 	//Target의 Armor 값
@@ -120,6 +125,8 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	//CriticalHitResistence는 CriticalHitChance를 일정 감소시킴. 
 	const float EffectiveCriticalHitChance = SourceCriticalHitChnace - CriticalHitResistanceCoefficients;
 	const bool bCriticalHIt = EffectiveCriticalHitChance > FMath::RandRange(1, 100);
+	UAuraAbilitySystemLibrary::SetIsCriticalHit(EffectContextHandle, bCriticalHIt);
+
 
 	// 치명타가 발생하면 데미지는 1.25 * CriticalHitDamage 만큼의 추가 피해를 입힘.
 	Damage = bCriticalHIt ? 1.25f * Damage * SourceCriticalHitDamage : Damage;

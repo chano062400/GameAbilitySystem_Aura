@@ -8,6 +8,7 @@
 #include "Interaction/CombatInterface.h"
 #include "Player/AuraPlayerController.h"
 #include "Kismet/GameplayStatics.h"
+#include "AbilitySystem/AuraAbilitySystemLibrary.h"
 
 UAuraAttributeSet::UAuraAttributeSet()
 {
@@ -123,20 +124,23 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 				}
 			}
 
-			ShowFloatingText(EffectProperties, LocalInComingDamage);
+			bool bIsBlockedHit = UAuraAbilitySystemLibrary::IsBlockedHit(EffectProperties.EffectContextHandle);
+			bool bIsCriticalHit = UAuraAbilitySystemLibrary::IsCriticalHit(EffectProperties.EffectContextHandle);
+
+			ShowFloatingText(EffectProperties, LocalInComingDamage, bIsBlockedHit, bIsCriticalHit);
 		}
 	}
 
 }
 
-void UAuraAttributeSet::ShowFloatingText(const FEffectProperties Props, float Damage)
+void UAuraAttributeSet::ShowFloatingText(const FEffectProperties Props, float Damage, bool bIsBlockedHit, bool bIsCriticalHit) const
 {
 	//스스로에게 피해를 입히는 경우는 안됨.
 	if (Props.SourceCharacter != Props.TargetCharacter)
 	{
 		if (AAuraPlayerController* PC = Cast<AAuraPlayerController>(Props.SourceCharacter->Controller))
 		{
-			PC->ShowDamageNumber(Damage, Props.TargetCharacter);
+			PC->ShowDamageNumber(Damage, Props.TargetCharacter, bIsBlockedHit, bIsCriticalHit);
 		}
 	}
 }

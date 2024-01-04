@@ -228,7 +228,7 @@ void AAuraPlayerController::PlayerTick(float DeltaTime)
 	AutoRun();
 }
 
-void AAuraPlayerController::ShowDamageNumber_Implementation(float Damage, ACharacter* TargetCharacter)
+void AAuraPlayerController::ShowDamageNumber_Implementation(float Damage, ACharacter* TargetCharacter, bool bIsBlockedHit, bool bIsCriticalHit)
 {
 	if (IsValid(TargetCharacter) && DamageTextComponentClass)
 	{
@@ -239,6 +239,6 @@ void AAuraPlayerController::ShowDamageNumber_Implementation(float Damage, AChara
 
 		//생성되자마자 애니메이션이 실행되는데, 계속 Attach상태라면 Enemy를 따라다닐 것이기 때문에, Detach해줘서 맞은 자리에서 애니메이션이 재생돼서 사라지도록.
 		DamageText->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-		DamageText->SetDamageText(Damage);
+		DamageText->SetDamageText(Damage, bIsBlockedHit, bIsCriticalHit);
 	}
 }
