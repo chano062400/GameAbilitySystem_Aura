@@ -70,7 +70,12 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	EvaluateParameters.TargetTags = TargetTags;
 
 	//Get Damage Set By Caller Magnitude , 찾을 수 없다면 0.f를 반환.
-	float Damage = Spec.GetSetByCallerMagnitude(FAuraGameplayTags::Get().Damage);
+	float Damage = 0.f;
+	for (const auto& DamageTypeTag : FAuraGameplayTags::Get().DamageTypesToResistances)
+	{
+		const float DamageTypeValue = Spec.GetSetByCallerMagnitude(DamageTypeTag.Key); // {DamageType, Resistance}
+		Damage += DamageTypeValue;
+	}
 
 	//Target의 BlockChance를 캡처. Block 한다면 Damage는 1/2이 됨.
 	float TargetBlockChance = 0.f;
