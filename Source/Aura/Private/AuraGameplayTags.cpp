@@ -55,7 +55,7 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 		FString("Bonus Damage added when a Critical Hit is Scored")
 	);
 
-	GameplayTags.Attributes_Secondary_CriticalHitResistence = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	GameplayTags.Attributes_Secondary_CriticalHitResistance = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Attributes.Secondary.CriticalHitResistence"),
 		FString("Reduces Critical Hit Chance of Attacking Enenies")
 	);
@@ -125,17 +125,17 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 	);
 		
 	GameplayTags.Damage_Lightning = UGameplayTagsManager::Get().AddNativeGameplayTag(
-		FName("Damage.Fire"),
+		FName("Damage.Lightning"),
 		FString("Lightning Damage Type")
 	);
 		
 	GameplayTags.Damage_Arcane = UGameplayTagsManager::Get().AddNativeGameplayTag(
-		FName("Damage.Fire"),
+		FName("Damage.Arcane"),
 		FString("Arcane Damage Type")
 	);
 		
 	GameplayTags.Damage_Physical = UGameplayTagsManager::Get().AddNativeGameplayTag(
-		FName("Damage.Fire"),
+		FName("Damage.Physical"),
 		FString("Physical Damage Type")
 	);
 
