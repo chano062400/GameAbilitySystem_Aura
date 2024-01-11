@@ -26,7 +26,7 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& TargetLocation)
 		const FVector SocketLocation = CombatInterface->GetCombatSocketLocation();
 
 		FRotator Rotation = (TargetLocation - SocketLocation).Rotation(); //발사 방향
-		Rotation.Pitch = 0.f; //지면과 평행하게 가도록.
+		//Rotation.Pitch = 0.f; //지면과 평행하게 가도록.
 
 		FTransform SpawnTransform;
 		SpawnTransform.SetLocation(SocketLocation); // 스폰위치 설정

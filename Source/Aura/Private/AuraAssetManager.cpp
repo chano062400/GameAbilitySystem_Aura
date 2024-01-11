@@ -17,6 +17,6 @@ void UAuraAssetManager::StartInitialLoading()
 	FAuraGameplayTags::Get().InitializeNativeGameplayTags();
 
 	//Target Data를 사용하기 위해서 초기화해줘야 함.
-	UAbilitySystemGlobals::Get().InitTargetDataScriptStructCache();
+	UAbilitySystemGlobals::Get().InitGlobalData();
 }
 

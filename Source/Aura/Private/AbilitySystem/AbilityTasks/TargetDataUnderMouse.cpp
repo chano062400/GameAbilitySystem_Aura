@@ -20,10 +20,12 @@ void UTargetDataUnderMouse::Activate()
 	else 
 	{
 		// Server에서 TargetData를 BroadCast 전에 받으면 
-		AbilitySystemComponent.Get()->AbilityTargetDataSetDelegate(GetAbilitySpecHandle(), GetActivationPredictionKey()).AddUObject(this, &UTargetDataUnderMouse::OnTargetDataReplicatedCallback);
+		const FGameplayAbilitySpecHandle SpecHandle = GetAbilitySpecHandle();
+		const FPredictionKey ActivationPredictionKey = GetActivationPredictionKey();
+		AbilitySystemComponent.Get()->AbilityTargetDataSetDelegate(SpecHandle, ActivationPredictionKey).AddUObject(this, &UTargetDataUnderMouse::OnTargetDataReplicatedCallback);
 		
 		//Server에서 이미 TargetData를 받고, Broadcast했다면 true, TargetData를 받지 못했다면 false를 반환
-		const bool bCalledDelegate = AbilitySystemComponent.Get()->CallReplicatedTargetDataDelegatesIfSet(GetAbilitySpecHandle(), GetActivationPredictionKey());
+		const bool bCalledDelegate = AbilitySystemComponent.Get()->CallReplicatedTargetDataDelegatesIfSet(SpecHandle, ActivationPredictionKey);
 		if(!bCalledDelegate) //TargetData를 받지 못했다면 기다림
 		{
 			SetWaitingOnRemotePlayerData();
@@ -40,10 +42,9 @@ void UTargetDataUnderMouse::SendMouseCursorData()
 	FHitResult CursorHit;
 	PC->GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, CursorHit);
 	
+	FGameplayAbilityTargetDataHandle DataHandle;
 	FGameplayAbilityTargetData_SingleTargetHit* Data = new FGameplayAbilityTargetData_SingleTargetHit();
 	Data->HitResult = CursorHit;
-
-	FGameplayAbilityTargetDataHandle DataHandle;
 	DataHandle.Add(Data);
 
 	AbilitySystemComponent->ServerSetReplicatedTargetData(
