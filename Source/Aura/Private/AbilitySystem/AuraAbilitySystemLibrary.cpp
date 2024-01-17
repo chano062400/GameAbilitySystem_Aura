@@ -8,6 +8,7 @@
 #include "Game/AuraGameModeBase.h"
 #include "AbilitySystemComponent.h"
 #include "AuraAbilityTypes.h"
+#include "Interaction/CombatInterface.h"
 
 UOverlayWidgetController* UAuraAbilitySystemLibrary::GetOverlayWidgetController(const UObject* WorldContextObject)
 {
@@ -73,14 +74,26 @@ void UAuraAbilitySystemLibrary::InitializeDefaultAttributes(const UObject* World
 
 }
 
-void UAuraAbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC)
+void UAuraAbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, ECharacterClass CharacterClass)
 {
-	UCharacterClassInfo* ClassDefaultInfo = GetCharacterClassInfo(WorldContextObject);
-	
-	for (auto Ability : ClassDefaultInfo->CommonAbilities)
+	UCharacterClassInfo* CharacterClassInfo = GetCharacterClassInfo(WorldContextObject);
+	if (CharacterClassInfo == nullptr) return;
+
+	for (auto Ability : CharacterClassInfo->CommonAbilities)
 	{
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(Ability, 1);
 		ASC->GiveAbility(AbilitySpec);
+	}
+
+	const FCharacterClassDefaultInfo& DefaultInfo = CharacterClassInfo->GetClassDefaultInfo(CharacterClass);
+	for (auto AbilityClass : DefaultInfo.StartAbilities)
+	{
+		if (TScriptInterface<ICombatInterface> CombatInterface = TScriptInterface<ICombatInterface>(ASC->GetAvatarActor()))
+		{
+			int32 Level = CombatInterface->GetPlayerLevel();
+			FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, Level);
+			ASC->GiveAbility(AbilitySpec);
+		}
 	}
 }
 
