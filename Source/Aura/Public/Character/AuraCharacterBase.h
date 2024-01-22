@@ -36,6 +36,14 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MulticastHandleDeath();
+	
+	// Combat Interface
+
+	virtual FVector GetCombatSocketLocation_Implementation() override;
+
+	virtual bool IsDead_Implementation() const override;
+
+	virtual AActor* GetAvatar_Implementation() override;
 
 protected:
 
@@ -49,7 +57,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	FName WeaponTipSocketName;
 
-	virtual FVector GetCombatSocketLocation_Implementation() override;
+	bool bDead = false;
 
 	// Enemy¿ë AbilitySystem ,AttributeSet
 
