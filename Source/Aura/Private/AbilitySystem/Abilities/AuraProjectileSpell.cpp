@@ -23,7 +23,7 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& TargetLocation)
 	TScriptInterface<ICombatInterface> CombatInterface = TScriptInterface<ICombatInterface>(GetAvatarActorFromActorInfo());
 	if (CombatInterface)
 	{
-		const FVector SocketLocation = CombatInterface->Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo());
+		const FVector SocketLocation = CombatInterface->Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), FAuraGameplayTags::Get().Montage_Attack_Weapon);
 
 		FRotator Rotation = (TargetLocation - SocketLocation).Rotation(); //발사 방향
 		//Rotation.Pitch = 0.f; //지면과 평행하게 가도록.

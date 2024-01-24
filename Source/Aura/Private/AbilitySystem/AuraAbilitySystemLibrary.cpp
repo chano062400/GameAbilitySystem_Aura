@@ -151,6 +151,12 @@ void UAuraAbilitySystemLibrary::GetLivePlayersWithInRadius(const UObject* WorldC
 	}
 }
 
+bool UAuraAbilitySystemLibrary::IsFriend(AActor* FirstActor, AActor* SecondActor)
+{
+	// 둘다 Player거나 Enemy라면 true이므로 서로 공격못하게 설정, false라면 서로 다르므로 서로 공격가능하게 설정. 
+	return FirstActor->ActorHasTag(FName("Player")) == SecondActor->ActorHasTag(FName("Player"));
+}
+
 void UAuraAbilitySystemLibrary::SetIsBlockedHit(FGameplayEffectContextHandle& EffectContextHandle, bool bInIsBlockedHit)
 {
 	if (FAuraGameplayEffectContext* AuraEffectContext = static_cast<FAuraGameplayEffectContext*>(EffectContextHandle.Get()))
