@@ -29,7 +29,7 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& TargetLocation)
 		//Rotation.Pitch = 0.f; //지면과 평행하게 가도록.
 
 		FTransform SpawnTransform;
-		SpawnTransform.SetLocation(SocketLocation); // 스폰위치 설정
+		SpawnTransform.SetLocation(SocketLocation); // 스폰위치 설정R
 		SpawnTransform.SetRotation(Rotation.Quaternion()); //스폰방향 설정.
 
 		//SpawnActor함수는 지정한 오브젝트의 인스턴스(객체)를 생성하고 월드에 배치하는 반면,

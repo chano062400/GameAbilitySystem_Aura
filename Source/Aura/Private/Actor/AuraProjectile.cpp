@@ -7,6 +7,7 @@
 #include "Aura/Aura.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/AuraAbilitySystemLibrary.h"
 
 AAuraProjectile::AAuraProjectile()
 {
@@ -43,25 +44,38 @@ void AAuraProjectile::BeginPlay()
 
 void AAuraProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OverlapActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromsweep, const FHitResult& HitResult)
 {
-	if (ImpactEffect && ImpactSound)
+	// 자기가 날린 Projectile에 피해를 입지 않도록.
+	if (DamageEffectSpecHandle.Data.IsValid() && DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser() == OverlapActor)
+	{
+		return;
+	}
+
+	// EffectCauser - Enemy이므로 OverlapActor가 다른 Enemy라면 피해입지 않도록.
+	if (DamageEffectSpecHandle.Data.IsValid() && UAuraAbilitySystemLibrary::IsFriend(DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser(), OverlapActor))
+	{
+		return;
+	}
+
+	if (!bHit)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
 
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation(), FRotator::ZeroRotator);
 
 		if (LoopingSoundComponent && LoopingSoundComponent->IsPlaying()) LoopingSoundComponent->Stop();
-
-		if (HasAuthority())
-		{
-			if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OverlapActor))
-			{
-				TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
-			}
-
-			Destroy();
-		}
-		else bHit = true;
 	}
+
+	if (HasAuthority())
+	{
+		if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OverlapActor))
+		{
+			TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
+		}
+
+		Destroy();
+	}
+	else bHit = true;
+
 }
 
 void AAuraProjectile::Destroyed()
