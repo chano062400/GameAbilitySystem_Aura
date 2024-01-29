@@ -44,6 +44,7 @@ void AAuraEnemy::PossessedBy(AController* NewController)
 	AuraAIController->RunBehaviorTree(BehaviorTree);
 	AuraAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), false);
 	AuraAIController->GetBlackboardComponent()->SetValueAsBool(FName("RangedAttacker"), CharacterClass != ECharacterClass::Warrior);
+	AuraAIController->GetBlackboardComponent()->SetValueAsBool(FName("IsDead"), false);
 }
 
 void AAuraEnemy::HighlightActor()
@@ -134,6 +135,7 @@ void AAuraEnemy::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCou
 void AAuraEnemy::Die()
 {
 	SetLifeSpan(LifeSpan);
+	if(AuraAIController) AuraAIController->GetBlackboardComponent()->SetValueAsBool(FName("IsDead"), true);
 	Super::Die();
 }
 

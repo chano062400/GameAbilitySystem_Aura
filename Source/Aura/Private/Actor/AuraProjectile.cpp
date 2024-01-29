@@ -45,13 +45,13 @@ void AAuraProjectile::BeginPlay()
 void AAuraProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OverlapActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromsweep, const FHitResult& HitResult)
 {
 	// 자기가 날린 Projectile에 피해를 입지 않도록.
-	if (DamageEffectSpecHandle.Data.IsValid() && DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser() == OverlapActor)
+	if (!DamageEffectSpecHandle.Data.IsValid() || DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser() == OverlapActor)
 	{
 		return;
 	}
 
 	// EffectCauser - Enemy이므로 OverlapActor가 다른 Enemy라면 피해입지 않도록.
-	if (DamageEffectSpecHandle.Data.IsValid() && UAuraAbilitySystemLibrary::IsFriend(DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser(), OverlapActor))
+	if (UAuraAbilitySystemLibrary::IsFriend(DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser(), OverlapActor))
 	{
 		return;
 	}

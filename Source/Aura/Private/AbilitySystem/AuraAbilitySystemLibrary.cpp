@@ -138,12 +138,7 @@ void UAuraAbilitySystemLibrary::GetLivePlayersWithInRadius(const UObject* WorldC
 		World->OverlapMultiByObjectType(Overlaps, SphereOrigin, FQuat::Identity, FCollisionObjectQueryParams(FCollisionObjectQueryParams::InitType::AllDynamicObjects), FCollisionShape::MakeSphere(Radius), SphereParams);
 		for (FOverlapResult& Overlap : Overlaps)
 		{
-			//GetActor가 CombatInterface를 상속받았는지.
-			const bool ImplementInterface = Overlap.GetActor()->Implements<UCombatInterface>();
-			//Overlap한 Actor가 살아있는지.
-			const bool IsAlive = !ICombatInterface::Execute_IsDead(Overlap.GetActor());
-			
-			if (ImplementInterface && IsAlive)
+			if (Overlap.GetActor()->Implements<UCombatInterface>() && !ICombatInterface::Execute_IsDead(Overlap.GetActor()))
 			{
 				OutOverlappingActors.AddUnique(ICombatInterface::Execute_GetAvatar(Overlap.GetActor()));
 			}
