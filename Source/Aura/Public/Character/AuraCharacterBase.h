@@ -8,10 +8,12 @@
 #include "Components/TimelineComponent.h"
 #include "AuraCharacterBase.generated.h"
 
+
 class UAttributeSet;
 class UGameplayEffect;
 class UGameplayAbility;
 class UAnimMontage;
+class UNiagaraSystem;
 
 UCLASS(Abstract)
 class AURA_API AAuraCharacterBase : public ACharacter, public IAbilitySystemInterface, public ICombatInterface
@@ -46,6 +48,8 @@ public:
 	virtual AActor* GetAvatar_Implementation() override;
 
 	TArray<FTaggedMontage> GetAttackMontage_Implementation() override;
+
+	virtual UNiagaraSystem* GetBloodEffect_Implementation() override;
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TArray<FTaggedMontage> AttackMontage;
@@ -122,6 +126,11 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UMaterialInstance> WeaponDissolveMI;
+
+	// Niagara 
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UNiagaraSystem> BloodEffect;
 
 private:
 
