@@ -51,6 +51,8 @@ public:
 
 	virtual UNiagaraSystem* GetBloodEffect_Implementation() override;
 
+	virtual FTaggedMontage GetTaggedMontage_Implementation(const FGameplayTag& MontageTag) override;
+
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TArray<FTaggedMontage> AttackMontage;
 
