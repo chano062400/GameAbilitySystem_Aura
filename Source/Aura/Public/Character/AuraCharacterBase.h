@@ -76,6 +76,9 @@ protected:
 
 	bool bDead = false;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+	TObjectPtr<USoundBase> DeathSound;
+
 	// Enemy¿ë AbilitySystem ,AttributeSet
 
 	UPROPERTY()
