@@ -47,11 +47,13 @@ public:
 
 	virtual AActor* GetAvatar_Implementation() override;
 
-	TArray<FTaggedMontage> GetAttackMontage_Implementation() override;
+	virtual TArray<FTaggedMontage> GetAttackMontage_Implementation() override;
 
 	virtual UNiagaraSystem* GetBloodEffect_Implementation() override;
 
 	virtual FTaggedMontage GetTaggedMontage_Implementation(const FGameplayTag& MontageTag) override;
+
+	virtual	int32 GetMinionCount_Implementation() override;
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TArray<FTaggedMontage> AttackMontage;
@@ -139,6 +141,10 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UNiagaraSystem> BloodEffect;
+
+	// Minion
+
+	int32 MinionCount = 0;
 
 private:
 

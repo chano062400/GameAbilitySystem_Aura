@@ -134,6 +134,11 @@ FTaggedMontage AAuraCharacterBase::GetTaggedMontage_Implementation(const FGamepl
 	return FTaggedMontage();
 }
 
+int32 AAuraCharacterBase::GetMinionCount_Implementation()
+{
+	return MinionCount;
+}
+
 void AAuraCharacterBase::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const
 {
 	check(IsValid(GetAbilitySystemComponent()));
