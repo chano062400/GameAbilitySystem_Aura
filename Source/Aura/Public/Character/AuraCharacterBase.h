@@ -55,6 +55,8 @@ public:
 
 	virtual	int32 GetMinionCount_Implementation() override;
 
+	virtual void UpdateMinionCount_Implementation(int32 Amount) override;
+
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TArray<FTaggedMontage> AttackMontage;
 
