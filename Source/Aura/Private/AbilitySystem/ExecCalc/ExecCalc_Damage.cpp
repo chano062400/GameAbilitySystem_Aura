@@ -112,7 +112,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 
 		const FGameplayEffectAttributeCaptureDefinition ResistanceCaptureDef = AuraDamagestatics().TagsToCaptureDefs[ResistanceType]; //TagsToCaptureDefs Map에서 Resistance Tag에 맞는 CaptureDef를 가져옴
 
-		float DamageTypeValue = Spec.GetSetByCallerMagnitude(DamageType);
+		float DamageTypeValue = Spec.GetSetByCallerMagnitude(DamageType, false, 0.0f);
 
 		float Resistance = 0.f;
 		ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(ResistanceCaptureDef, EvaluateParameters, Resistance); 
