@@ -3,6 +3,7 @@
 #include "UI/WidgetController/OverlayWidgetController.h"
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
+#include "AbilitySystem/Data/AbilityInfo.h"
 
 void UOverlayWidgetController::BroadcastInitialValues()
 {
@@ -53,26 +54,55 @@ void UOverlayWidgetController::BindCallbacksToDependencies() // Attribute가 변경
 			}
 			);
 
-	Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent)->EffectAssetTags.AddLambda( //AddLamda - 즉석에서 함수를 정의.
-		[this](const FGameplayTagContainer& AssetTags /*매개변수*/)
+	if (UAuraAbilitySystemComponent* AuraASC = Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent))
+	{
+		if (AuraASC->bStartUpAbilitiesGiven) // Startup Ability가 부여된 경우
 		{
-			for (const FGameplayTag& Tag : AssetTags)
+			OnInitializeStartUpAbilities(AuraASC);
+		}
+		else // 부여되지 않은 경우에는 Bind만 시킴.
+		{
+			AuraASC->AbilitiesGivenDelegate.AddUObject(this, &UOverlayWidgetController::OnInitializeStartUpAbilities);
+		}
+
+		AuraASC->EffectAssetTags.AddLambda( //AddLamda - 즉석에서 함수를 정의.
+			[this](const FGameplayTagContainer& AssetTags /*매개변수*/)
 			{
-				//"A.1".MatchesTag("A") will return true, but "A".MatchesTag("A.1") will return false
-				//EX) "Message.HealthPotion".MatchesTag("Message") will return true, but "Message".MatchesTag("Message.HealthPotion") will return false
-				FGameplayTag MessageTag = FGameplayTag::RequestGameplayTag(FName("Message"));
-
-				//GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Blue, FString::Printf(TEXT("%s"), *Tag.ToString())); //TagName을 표시.
-
-				if (Tag.MatchesTag(MessageTag)) // MessageTag인 경우에만 MessageWidgetTable에서 탐색.
+				for (const FGameplayTag& Tag : AssetTags)
 				{
-					//Lamba함수는 전역함수는 바로 사용할 수 있지만, 멤버함수는 []안에 해당 멤버함수의 클래스 캡처를 해야 사용 가능.(this)
-					const FUIWidgetRow* Row = GetDataTableRowByTag<FUIWidgetRow>(MessageWidgetTable, Tag);
-					MessageWidgetRowDelegate.Broadcast(*Row); 
+					//"A.1".MatchesTag("A") will return true, but "A".MatchesTag("A.1") will return false
+					//EX) "Message.HealthPotion".MatchesTag("Message") will return true, but "Message".MatchesTag("Message.HealthPotion") will return false
+					FGameplayTag MessageTag = FGameplayTag::RequestGameplayTag(FName("Message"));
+
+					//GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Blue, FString::Printf(TEXT("%s"), *Tag.ToString())); //TagName을 표시.
+
+					if (Tag.MatchesTag(MessageTag)) // MessageTag인 경우에만 MessageWidgetTable에서 탐색.
+					{
+						//Lamba함수는 전역함수는 바로 사용할 수 있지만, 멤버함수는 []안에 해당 멤버함수의 클래스 캡처를 해야 사용 가능.(this)
+						const FUIWidgetRow* Row = GetDataTableRowByTag<FUIWidgetRow>(MessageWidgetTable, Tag);
+						MessageWidgetRowDelegate.Broadcast(*Row);
+					}
 				}
 			}
+		);
+	}
+
+}
+
+void UOverlayWidgetController::OnInitializeStartUpAbilities(UAuraAbilitySystemComponent* AuraAbilitySystemComponent)
+{
+	if (!AuraAbilitySystemComponent->bStartUpAbilitiesGiven) return;
+
+	FForEachAbility BroadCastDelegate;
+	BroadCastDelegate.BindLambda(
+		[this, AuraAbilitySystemComponent](const FGameplayAbilitySpec& AbilitySpec)
+		{
+			FAuraAbilityInfo Info = AbilityInfo->FindAbilityInfoForTag(AuraAbilitySystemComponent->GetAbilityTagFromSpec(AbilitySpec));
+			Info.InputTag = AuraAbilitySystemComponent->GetInputTagFromSpec(AbilitySpec);
+			AbilityInfoDelegate.Broadcast(Info);
 		}
 	);
 
+	AuraAbilitySystemComponent->ForEachAbility(BroadCastDelegate);
 }
 

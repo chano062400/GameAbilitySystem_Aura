@@ -4,6 +4,7 @@
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AuraGameplayTags.h"
 #include "AbilitySystem/Abilities/AuraGameplayAbility.h"
+#include "Aura/Public/AuraLogChannel.h"
 
 void UAuraAbilitySystemComponent::AbilityActorInfoSet()
 {
@@ -23,6 +24,9 @@ void UAuraAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf
 			GiveAbility(AbilitySpec);
 		}
 	}
+	bStartUpAbilitiesGiven = true;
+
+	AbilitiesGivenDelegate.Broadcast(this);
 }
 
 void UAuraAbilitySystemComponent::AbilityInputTagHeld(const FGameplayTag& InputTag)
@@ -53,6 +57,62 @@ void UAuraAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& In
 		{
 			AbilitySpecInputReleased(AbilitySpec);
 		}
+	}
+}
+
+void UAuraAbilitySystemComponent::ForEachAbility(const FForEachAbility& Delegate)
+{
+	// 능력을 반복하는 동안 능력 시스템 구성 요소에서 능력을 제거하는 것을 방지하는 데 사용됩니다.
+	FScopedAbilityListLock ActiveScopeLock(*this);
+
+	for (const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		if (!Delegate.ExecuteIfBound(AbilitySpec))
+		{
+			UE_LOG(AuraLog, Error, TEXT("Failed to Execute Delegate in %hs"), __FUNCTION__);
+		}
+	}
+}
+
+FGameplayTag UAuraAbilitySystemComponent::GetAbilityTagFromSpec(const FGameplayAbilitySpec& AbilitySpec)
+{
+	if (AbilitySpec.Ability)
+	{
+		for (const FGameplayTag Tag : AbilitySpec.Ability.Get()->AbilityTags)
+		{
+			// Abilities 상위 태그를 모두 탐색.
+			if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Abilities"))))
+			{
+				return Tag;
+			}
+		}
+	}
+
+	return FGameplayTag();
+}
+
+FGameplayTag UAuraAbilitySystemComponent::GetInputTagFromSpec(const FGameplayAbilitySpec& AbilitySpec)
+{
+	for (FGameplayTag Tag : AbilitySpec.DynamicAbilityTags)
+	{
+		// InputTag 태그에 해당하는 태그인지 확인.
+		if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("InputTag"))))
+		{
+			return Tag;
+		}
+	}
+
+	return FGameplayTag();
+}
+
+void UAuraAbilitySystemComponent::OnRep_ActivateAbilities()
+{
+	Super::OnRep_ActivateAbilities();
+
+	if (!bStartUpAbilitiesGiven)
+	{
+		bStartUpAbilitiesGiven = true;
+		AbilitiesGivenDelegate.Broadcast(this);
 	}
 }
 

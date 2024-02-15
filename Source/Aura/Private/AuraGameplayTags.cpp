@@ -228,5 +228,10 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 		FName("Abilities.Summon"),
 		FString("Summon Ability Tag")
 	);
+	
+	GameplayTags.Abilities_FireBolt = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Abilities.FireBolt"),
+		FString("FireBolt Ability Tag")
+	);
 
 }
