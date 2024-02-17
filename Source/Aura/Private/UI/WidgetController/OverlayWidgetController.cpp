@@ -4,6 +4,8 @@
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystem/Data/AbilityInfo.h"
+#include "Player/AuraPlayerState.h"
+#include "AbilitySystem/Data/LevelUpInfo.h"
 
 void UOverlayWidgetController::BroadcastInitialValues()
 {
@@ -20,6 +22,9 @@ void UOverlayWidgetController::BroadcastInitialValues()
 
 void UOverlayWidgetController::BindCallbacksToDependencies() // Attribute가 변경되었을때.
 {
+	AAuraPlayerState* AuraPlayerState = CastChecked<AAuraPlayerState>(PlayerState);
+	AuraPlayerState->OnXPChangedDelegate.AddUObject(this, &UOverlayWidgetController::OnXPChanged);
+
 	const UAuraAttributeSet* AuraAttributeSet = CastChecked<UAuraAttributeSet>(AttributeSet);
 
 	//FOnGameplayAttributeValueChange Delegate가 DYNAMIC이 아니라서 AddUObject를 사용.
@@ -85,6 +90,8 @@ void UOverlayWidgetController::BindCallbacksToDependencies() // Attribute가 변경
 				}
 			}
 		);
+
+
 	}
 
 }
@@ -104,5 +111,30 @@ void UOverlayWidgetController::OnInitializeStartUpAbilities(UAuraAbilitySystemCo
 	);
 
 	AuraAbilitySystemComponent->ForEachAbility(BroadCastDelegate);
+}
+
+void UOverlayWidgetController::OnXPChanged(int32 NewXP) const
+{
+	AAuraPlayerState* AuraPlayerState = CastChecked<AAuraPlayerState>(PlayerState);
+	const ULevelUpInfo* LevelUpInfo = AuraPlayerState->LevelUpInfo;
+	checkf(LevelUpInfo, TEXT("Can't find the LevelUpInfo, Please fill out AuraPlayerState Blueprint"));
+
+	const int32 Level = LevelUpInfo->FindLevelForXP(NewXP);
+	const int32 MaxLevel = LevelUpInfo->LevelUpInformation.Num();
+
+	if (Level > 0 && Level <= MaxLevel)
+	{
+		const int32 LevelRequirement = LevelUpInfo->LevelUpInformation[Level].LevelUpRequirement;
+		const int32 PreLevelRequirement = LevelUpInfo->LevelUpInformation[Level - 1].LevelUpRequirement;
+		
+		const int32 DifLevelRequirement = LevelRequirement - PreLevelRequirement;
+		const int32 CurXP = NewXP - PreLevelRequirement;
+
+		// 1레벨 300 2레벨 900 NewXP = 700. CurXP = 400. XPPercent = 400 / 600  
+		const float XPBarPercent = static_cast<float>(CurXP) / static_cast<float>(DifLevelRequirement);
+
+		OnXPPercentChangedDelegate.Broadcast(XPBarPercent);
+	}
+
 }
 
