@@ -178,6 +178,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Meta Attributes")
 	FGameplayAttributeData InComingDamage;
 	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, InComingDamage);
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Meta Attributes")
+	FGameplayAttributeData InComingXP;
+	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, InComingXP);
 
 	// OnRep Function
 

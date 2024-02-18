@@ -76,6 +76,11 @@ AActor* AAuraEnemy::GetCombatTarget_Implementation() const
 	return CombatTarget;
 }
 
+ECharacterClass AAuraEnemy::GetCharacterClass_Implementation()
+{
+	return CharacterClass;
+}
+
 void AAuraEnemy::BeginPlay()
 {
 	Super::BeginPlay();

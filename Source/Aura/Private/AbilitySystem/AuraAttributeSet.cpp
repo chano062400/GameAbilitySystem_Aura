@@ -115,6 +115,7 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	if (Data.EvaluatedData.Attribute == GetInComingDamageAttribute())
 	{
 		const float LocalInComingDamage = GetInComingDamage();
+
 		SetInComingDamage(0.f);
 		if (LocalInComingDamage > 0.f)
 		{
@@ -135,12 +136,19 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 				{
 					Interface->Die();
 				}
+
 			}
 
 			bool bIsBlockedHit = UAuraAbilitySystemLibrary::IsBlockedHit(EffectProperties.EffectContextHandle);
 			bool bIsCriticalHit = UAuraAbilitySystemLibrary::IsCriticalHit(EffectProperties.EffectContextHandle);
 
 			ShowFloatingText(EffectProperties, LocalInComingDamage, bIsBlockedHit, bIsCriticalHit);
+		}
+
+		if (Data.EvaluatedData.Attribute == GetInComingXPAttribute())
+		{
+			const float LocalIncomingXP = GetInComingXP();
+			SetInComingXP(0.f);
 		}
 	}
 
