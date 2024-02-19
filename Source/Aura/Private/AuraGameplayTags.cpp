@@ -161,6 +161,14 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 		FString("Resistance to Physical Damage ")
 	);
 
+
+	// Meta Attributes
+	
+	GameplayTags.Attributes_Meta_XP = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attributes.Meta.XP"),
+		FString("Incoming XP Meta Attribute")
+	);
+
 	// 각 Damage Type에 대응하는 Resistance를 가진 Map.
 	
 	GameplayTags.DamageTypesToResistances.Add({ GameplayTags.Damage_Fire, GameplayTags.Attributes_Resistance_Fire });
