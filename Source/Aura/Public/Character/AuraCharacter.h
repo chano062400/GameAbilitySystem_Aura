@@ -28,9 +28,25 @@ public:
 
 	virtual void AddToXP_Implementation(int32 InXP) override;
 
+	virtual int32 GetXP_Implementation() const override;
+
+	virtual void LevelUp_Implementation() override;
+
+	virtual void AddToPlayerLevel_Implementation(int32 InPlayerLevel) override;
+
+	virtual int32 FindLevelForXP_Implementation(int32 InXP) const override;
+
+	virtual int32 GetAttributePointsReward_Implementation(int32 CurLevel) const override;
+
+	virtual int32 GetSpellPointsReward_Implementation(int32 CurLevel) const override;
+
+	virtual void AddAttributePointsReward_Implementation(int32 InAttributePoint)override;
+
+	virtual void AddSpellPointsReward_Implementation(int32 InSpellPoint)override;
+
 	/* Combat interface */
 
-	virtual int32 GetPlayerLevel() override;
+	virtual int32 GetPlayerLevel_Implementation() override;
 
 protected:
 
