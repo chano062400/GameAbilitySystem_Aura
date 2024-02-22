@@ -8,6 +8,10 @@
 
 class AAuraPlayerController;
 class AAuraHUD;
+class UNiagaraComponent;
+class USpringArmComponent;
+class UCameraComponent;
+
 /**
  * 
  */
@@ -48,10 +52,22 @@ public:
 
 	virtual int32 GetPlayerLevel_Implementation() override;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UNiagaraComponent> LevelUpNiagaraComponent;
+
 protected:
 
 
 private:
 	 
 	virtual void InitAbilityActorInfo() override;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastPlayLevelUpEffect();
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UCameraComponent> TopDownCamera;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USpringArmComponent> CameraSpringArm;
 };

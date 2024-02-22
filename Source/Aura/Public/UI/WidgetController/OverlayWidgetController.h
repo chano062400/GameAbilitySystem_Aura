@@ -69,6 +69,11 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "GAS|AbilityInfo")
 	FAbilityInfoSignature AbilityInfoDelegate;
+	
+	UPROPERTY(BlueprintAssignable, Category = "GAS|PlayerStat")
+	FOnPlayerStatChangedSignature OnPlayerLevelChangedDelegate;
+
+
 
 protected:
 

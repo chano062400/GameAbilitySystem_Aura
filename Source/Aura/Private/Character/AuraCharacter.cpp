@@ -9,6 +9,9 @@
 #include "Player/AuraPlayerController.h"
 #include "UI/HUD/AuraHUD.h"
 #include "AbilitySystem/Data/LevelUpInfo.h"
+#include "NiagaraComponent.h"
+#include "Camera/CameraComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 
 AAuraCharacter::AAuraCharacter()
 {
@@ -16,6 +19,22 @@ AAuraCharacter::AAuraCharacter()
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 640.f, 0.f);
 	GetCharacterMovement()->bConstrainToPlane = true; // 캐릭터의 이동을 평면(NavMesh)으로 제한.
 	GetCharacterMovement()->bSnapToPlaneAtStart = true; //시작할 때 캐릭터의 위치가 평면을 벗어난 상태라면 가까운 평면(NavMesh)으로 붙여서 시작되도록 한다
+
+	CameraSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm Component"));
+	CameraSpringArm->SetupAttachment(GetRootComponent());
+	//bAbsoluteRotation은 스프링 암의 회전이 루트 컴포넌트와 상위 컴포넌트를 따르지 않고 월드 좌표계의 회전을 따르도록 한다.
+	CameraSpringArm->SetUsingAbsoluteRotation(true);
+	//bDoCollisionTest는 카메라가 벽에 닿으면 충돌 계산을 통해 카메라와 캐릭터의 거리를 좁혀 카메라가 벽을 뚫지 않게 만들어주는 프로퍼티이지만, Rpg게임에서는 사용되지 않는 옵션이기 때문에 false로 설정한다.
+	CameraSpringArm->bDoCollisionTest = false;
+
+	TopDownCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDown Camera Component"));
+	//SocketName - SpringArm의 끝.
+	TopDownCamera->SetupAttachment(CameraSpringArm, USpringArmComponent::SocketName);
+	TopDownCamera->bUsePawnControlRotation = false;
+
+	LevelUpNiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("LevelUpNiagaraComponent"));
+	LevelUpNiagaraComponent->SetupAttachment(GetRootComponent());
+	LevelUpNiagaraComponent->bAutoActivate = false;
 
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
@@ -60,10 +79,7 @@ int32 AAuraCharacter::GetXP_Implementation() const
 
 void AAuraCharacter::LevelUp_Implementation()
 {
-	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
-	check(AuraPlayerState);
-
-
+	MulticastPlayLevelUpEffect();
 }
 
 void AAuraCharacter::AddToPlayerLevel_Implementation(int32 InPlayerLevel)
@@ -102,10 +118,16 @@ int32 AAuraCharacter::GetSpellPointsReward_Implementation(int32 CurLevel) const
 
 void AAuraCharacter::AddAttributePointsReward_Implementation(int32 InAttributePoint)
 {
+	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
+	check(AuraPlayerState);
+	AuraPlayerState->AddToAttributePoint(InAttributePoint);
 }
 
 void AAuraCharacter::AddSpellPointsReward_Implementation(int32 InSpellPoint)
 {
+	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
+	check(AuraPlayerState);
+	AuraPlayerState->AddToSpellPoint(InSpellPoint);
 }
 
 int32 AAuraCharacter::GetPlayerLevel_Implementation()
@@ -141,5 +163,19 @@ void AAuraCharacter::InitAbilityActorInfo()
 	}
 
 	InitializeDefaultAttributes();
+}
+
+void AAuraCharacter::MulticastPlayLevelUpEffect_Implementation()
+{
+	// LevelUpNiagara를 카메라 쪽으로 회전시켜서 재생.
+	if (IsValid(LevelUpNiagaraComponent))
+	{
+		const FVector CameraLoc = TopDownCamera->GetComponentLocation();
+		const FVector NiagaraLoc = LevelUpNiagaraComponent->GetComponentLocation();
+		const FRotator ToCameraRotation = (CameraLoc - NiagaraLoc).Rotation();
+
+		LevelUpNiagaraComponent->SetWorldRotation(ToCameraRotation);
+		LevelUpNiagaraComponent->Activate(true);
+	}
 }
 
