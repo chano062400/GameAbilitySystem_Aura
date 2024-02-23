@@ -130,6 +130,22 @@ void AAuraCharacter::AddSpellPointsReward_Implementation(int32 InSpellPoint)
 	AuraPlayerState->AddToSpellPoint(InSpellPoint);
 }
 
+int32 AAuraCharacter::GetAttributePoint_Implementation() const
+{
+	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
+	check(AuraPlayerState);
+	
+	return AuraPlayerState->GetAttributePoint();
+}
+
+int32 AAuraCharacter::GetSpellPoint_Implementation() const
+{
+	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
+	check(AuraPlayerState);
+
+	return AuraPlayerState->GetSpellPoint();
+}
+
 int32 AAuraCharacter::GetPlayerLevel_Implementation()
 {
 	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();

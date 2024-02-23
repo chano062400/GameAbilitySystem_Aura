@@ -79,6 +79,8 @@ public:
 
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 
+	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue);
+
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 	
 	TMap<FGameplayTag, TAttributeFunPtr<FGameplayAttribute()>> TagsToAttributes;
@@ -252,4 +254,9 @@ private:
 	void ShowFloatingText(const FEffectProperties Props, float Damage, bool bIsBlockedHit, bool bIsCriticalHit) const;
 
 	void SendXPEvent(const FEffectProperties Props);
+
+	// TopOff - °¡µæ Ã¤¿ì´Ù.
+	bool bTopOffHealth = false;
+	
+	bool bTopOffMana = false;
 };

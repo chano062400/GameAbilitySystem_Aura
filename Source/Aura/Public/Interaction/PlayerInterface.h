@@ -39,6 +39,12 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent)
 	int32 GetSpellPointsReward(int32 CurLevel) const;
+	
+	UFUNCTION(BlueprintNativeEvent)
+	int32 GetAttributePoint() const;
+		
+	UFUNCTION(BlueprintNativeEvent)
+	int32 GetSpellPoint() const;
 
 	UFUNCTION(BlueprintNativeEvent)
 	void AddAttributePointsReward(int32 InAttributePoint);
