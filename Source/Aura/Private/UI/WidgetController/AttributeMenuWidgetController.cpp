@@ -20,8 +20,7 @@ void UAttributeMenuWidgetController::BroadcastInitialValues()
 		AttributeInfoDelegate.Broadcast(Info);
 	}
 
-	AAuraPlayerState* AuraPlayerState = CastChecked<AAuraPlayerState>(PlayerState);
-	AttributePointChangedDelegate.Broadcast(AuraPlayerState->GetAttributePoint());
+	AttributePointChangedDelegate.Broadcast(GetAuraPS()->GetAttributePoint());
 }
 
 void UAttributeMenuWidgetController::BindCallbacksToDependencies()
@@ -40,8 +39,7 @@ void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 		);
 	}
 
-	AAuraPlayerState* AuraPlayerState = CastChecked<AAuraPlayerState>(PlayerState);
-	AuraPlayerState->OnAttributePointChangedDelegate.AddLambda(
+	GetAuraPS()->OnAttributePointChangedDelegate.AddLambda(
 		[this](int32 NewPoint)
 		{
 			AttributePointChangedDelegate.Broadcast(NewPoint);
