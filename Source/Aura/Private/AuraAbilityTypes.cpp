@@ -7,11 +7,11 @@ bool FAuraGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 	{
 		if (bReplicateInstigator && Instigator.IsValid())
 		{
-			RepBits |= 1 << 0; // 왼쪽에서 0번째 bit는 Instiagtor를 의미.
+			RepBits |= 1 << 0; // 오른쪽에서 0번째 bit는 Instiagtor를 의미.
 		}
 		if (bReplicateEffectCauser && EffectCauser.IsValid())
 		{
-			RepBits |= 1 << 1; // 왼쪽에서 1번째 bit는 EffectCauser를 의미.
+			RepBits |= 1 << 1; // 오른쪽에서 1번째 bit는 EffectCauser를 의미.
 		}
 		if (AbilityCDO.IsValid())
 		{
@@ -35,11 +35,11 @@ bool FAuraGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 		}
 		if (bIsBlockedHit)
 		{
-			RepBits |= 1 << 7; // 왼쪽에서 8번째 bit는 IsBlockedHit를 의미.
+			RepBits |= 1 << 7; // 오른쪽에서 7번째 bit는 IsBlockedHit를 의미.
 		}
 		if (bIsCriticalHit)
 		{
-			RepBits |= 1 << 8; // 왼쪽에서 8번째 bit는 IsCriticalHit를 의미.
+			RepBits |= 1 << 8; // 오른쪽에서 8번째 bit는 IsCriticalHit를 의미.
 		}
 	}
 
