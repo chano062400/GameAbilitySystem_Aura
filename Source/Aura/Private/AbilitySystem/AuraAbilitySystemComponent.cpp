@@ -7,6 +7,8 @@
 #include "Aura/Public/AuraLogChannel.h"
 #include "Interaction/PlayerInterface.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystem/AuraAbilitySystemLibrary.h"
+#include "AbilitySystem/Data/AbilityInfo.h"
 
 void UAuraAbilitySystemComponent::AbilityActorInfoSet()
 {
@@ -157,6 +159,57 @@ void UAuraAbilitySystemComponent::ServerUpgradeAttribute_Implementation(const FG
 	}
 }
 
+FGameplayAbilitySpec* UAuraAbilitySystemComponent::GetSpecFromAbilityTag(const FGameplayTag& AbilityTag)
+{
+	/** Used to stop us from removing abilities from an ability system component while we're iterating through the abilities */
+	FScopedAbilityListLock ActiveScopeLoc(*this);
+
+	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		// 해당 Ability가 갖고있는 Tag
+		for (FGameplayTag Tag : AbilitySpec.Ability.Get()->AbilityTags)
+		{
+			if (Tag.MatchesTag(AbilityTag))
+			{
+				return &AbilitySpec;
+			}
+		}
+	}
+
+	// 해당하는 Ability가 없으면 nullptr 반환.
+	return nullptr;
+}
+
+void UAuraAbilitySystemComponent::UpdateAbilityStatuses(int32 Level)
+{
+	if (UAbilityInfo* AbilityInfo = UAuraAbilitySystemLibrary::GetAbilityInfo(GetAvatarActor()))
+	{
+		for (const FAuraAbilityInfo& Info : AbilityInfo->AbilityInformations)
+		{
+			if (!Info.AbilityTag.IsValid()) continue;
+			if (Info.LevelRequirement > Level) continue;
+
+			if (Info.LevelRequirement <= Level)
+			{
+				// 아직 ASC에 등록되지 않은 Ability라면
+				if (GetSpecFromAbilityTag(Info.AbilityTag) == nullptr)
+				{
+					FGameplayAbilitySpec AbilitySpec(Info.Ability, 1);
+					//레벨 조건을 달성했으므로 Eligible Status로 변경.
+					AbilitySpec.DynamicAbilityTags.AddTag(FAuraGameplayTags::Get().Abilities_Status_Eligible);
+					GiveAbility(AbilitySpec);
+
+					/** Call to mark that an ability spec has been modified */
+					// 다음 업데이트까지 기다리지 않고 AbilitySpec을 바로 Replicate함.
+					MarkAbilitySpecDirty(AbilitySpec);
+
+					ClientUpdateAbilityStatus(Info.AbilityTag, FAuraGameplayTags::Get().Abilities_Status_Eligible);
+				}
+			}
+		}
+	}
+}
+
 void UAuraAbilitySystemComponent::OnRep_ActivateAbilities()
 {
 	Super::OnRep_ActivateAbilities();
@@ -166,6 +219,11 @@ void UAuraAbilitySystemComponent::OnRep_ActivateAbilities()
 		bStartUpAbilitiesGiven = true;
 		AbilitiesGivenDelegate.Broadcast();
 	}
+}
+
+void UAuraAbilitySystemComponent::ClientUpdateAbilityStatus_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag)
+{
+	AbilityStatusChanged.Broadcast(AbilityTag, StatusTag);
 }
 
 void UAuraAbilitySystemComponent::ClientEffectApplied_Implementation(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle)

@@ -87,6 +87,9 @@ void AAuraCharacter::AddToPlayerLevel_Implementation(int32 InPlayerLevel)
 	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
 	check(AuraPlayerState);
 	AuraPlayerState->AddToLevel(InPlayerLevel);
+
+	UAuraAbilitySystemComponent* AuraASC = CastChecked<UAuraAbilitySystemComponent>(AbilitySystemComponent);
+	AuraASC->UpdateAbilityStatuses(AuraPlayerState->GetPlayerLevel());
 }
 
 int32 AAuraCharacter::FindLevelForXP_Implementation(int32 InXP) const
