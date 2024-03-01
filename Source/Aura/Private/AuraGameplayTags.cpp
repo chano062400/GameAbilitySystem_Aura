@@ -296,6 +296,11 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 		FName("Abilities.Type.None"),
 		FString("None Type")
 	);
+				
+	GameplayTags.Abilities_None = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Abilities.None"),
+		FString("No Ability - nullptr for Ability Tags")
+	);
 
 	// Cooldwon
 
