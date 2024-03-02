@@ -13,8 +13,19 @@ void USpellMenuWidgetController::BroadcastInitialValues()
 void USpellMenuWidgetController::BindCallbacksToDependencies()
 {
 	GetAuraASC()->AbilityStatusChanged.AddLambda(
-		[this](const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag)
+		[this](const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag, int32 AbilityLevel)
 		{
+			if (SelectedAbility.Ability.MatchesTagExact(AbilityTag))
+			{
+				SelectedAbility.Status = StatusTag;
+			
+				bool bEnableSpendPointButton = false;
+				bool bEnableEquippedButton = false;
+
+				ShouldEnableButton(StatusTag, CurSpellPoint, bEnableSpendPointButton, bEnableEquippedButton);
+				SpellGlobeSelectedDelegate.Broadcast(bEnableSpendPointButton, bEnableEquippedButton);
+			}			
+			
 			if (AbilityInfo)
 			{
 				FAuraAbilityInfo Info = AbilityInfo->FindAbilityInfoForTag(AbilityTag);
@@ -28,6 +39,13 @@ void USpellMenuWidgetController::BindCallbacksToDependencies()
 		[this](int32 SpellPoints)
 		{
 			OnSpellPointChanged.Broadcast(SpellPoints);
+			CurSpellPoint = SpellPoints;
+
+			bool bEnableSpendPointButton = false;
+			bool bEnableEquippedButton = false;
+
+			ShouldEnableButton(SelectedAbility.Status, CurSpellPoint, bEnableSpendPointButton, bEnableEquippedButton);
+			SpellGlobeSelectedDelegate.Broadcast(bEnableSpendPointButton, bEnableEquippedButton);
 		}
 	);
 }
@@ -51,6 +69,9 @@ void USpellMenuWidgetController::SpellGlobeSelected(const FGameplayTag& AbilityT
 		StatusTag = GetAuraASC()->GetStatusFromSpec(*AbilitySpec);
 	}
 
+	SelectedAbility.Ability = AbilityTag;
+	SelectedAbility.Status = StatusTag;
+
 	bool bEnableSpendPointButton = false;
 	bool bEnableEquippedButton = false;
 	
@@ -58,6 +79,14 @@ void USpellMenuWidgetController::SpellGlobeSelected(const FGameplayTag& AbilityT
 	ShouldEnableButton(StatusTag, SpellPoint, bEnableSpendPointButton, bEnableEquippedButton);
 
 	SpellGlobeSelectedDelegate.Broadcast(bEnableSpendPointButton, bEnableEquippedButton);
+}
+
+void USpellMenuWidgetController::SpendPointButtonPressed()
+{
+	if (GetAuraASC())
+	{
+		GetAuraASC()->ServerSpendPoint(SelectedAbility.Ability);
+	}
 }
 
 void USpellMenuWidgetController::ShouldEnableButton(const FGameplayTag& StatusTag, int32 SpellPoint, bool& bShouldEnableSpellPointButton, bool& bShouldEnableEquippedButton)
