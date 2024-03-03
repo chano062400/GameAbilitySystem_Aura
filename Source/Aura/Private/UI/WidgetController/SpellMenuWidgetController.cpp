@@ -23,7 +23,11 @@ void USpellMenuWidgetController::BindCallbacksToDependencies()
 				bool bEnableEquippedButton = false;
 
 				ShouldEnableButton(StatusTag, CurSpellPoint, bEnableSpendPointButton, bEnableEquippedButton);
-				SpellGlobeSelectedDelegate.Broadcast(bEnableSpendPointButton, bEnableEquippedButton);
+
+				FString Description, NextLevelDescription;
+				GetAuraASC()->GetDescriptionByAbilityTag(AbilityTag, Description, NextLevelDescription);
+
+				SpellGlobeSelectedDelegate.Broadcast(bEnableSpendPointButton, bEnableEquippedButton, Description, NextLevelDescription);
 			}			
 			
 			if (AbilityInfo)
@@ -45,7 +49,11 @@ void USpellMenuWidgetController::BindCallbacksToDependencies()
 			bool bEnableEquippedButton = false;
 
 			ShouldEnableButton(SelectedAbility.Status, CurSpellPoint, bEnableSpendPointButton, bEnableEquippedButton);
-			SpellGlobeSelectedDelegate.Broadcast(bEnableSpendPointButton, bEnableEquippedButton);
+
+			FString Description, NextLevelDescription;
+			GetAuraASC()->GetDescriptionByAbilityTag(SelectedAbility.Ability, Description, NextLevelDescription);
+
+			SpellGlobeSelectedDelegate.Broadcast(bEnableSpendPointButton, bEnableEquippedButton, Description, NextLevelDescription);
 		}
 	);
 }
@@ -78,7 +86,10 @@ void USpellMenuWidgetController::SpellGlobeSelected(const FGameplayTag& AbilityT
 	// 함수 내에 있는 지역변수를 매개변수로 넣어서 변경할 것이므로 bool&로 받음
 	ShouldEnableButton(StatusTag, SpellPoint, bEnableSpendPointButton, bEnableEquippedButton);
 
-	SpellGlobeSelectedDelegate.Broadcast(bEnableSpendPointButton, bEnableEquippedButton);
+	FString Description, NextLevelDescription;
+	GetAuraASC()->GetDescriptionByAbilityTag(AbilityTag, Description, NextLevelDescription);
+
+	SpellGlobeSelectedDelegate.Broadcast(bEnableSpendPointButton, bEnableEquippedButton, Description, NextLevelDescription);
 }
 
 void USpellMenuWidgetController::SpendPointButtonPressed()
