@@ -39,6 +39,8 @@ void USpellMenuWidgetController::BindCallbacksToDependencies()
 		}
 	);
 
+	GetAuraASC()->AbilityEquippedDelegate.AddUObject(this, &USpellMenuWidgetController::OnAbilityEquipped);
+
 	GetAuraPS()->OnSpellPointChangedDelegate.AddLambda(
 		[this](int32 SpellPoints)
 		{
@@ -128,11 +130,59 @@ void USpellMenuWidgetController::GlobeDeselect()
 
 void USpellMenuWidgetController::EquipButtonPressed()
 {
+	// Offensive or Passive
 	const FGameplayTag AbilityType = AbilityInfo->FindAbilityInfoForTag(SelectedAbility.Ability).AbilityType;
 
 	WaitForEquipSelectionDelegate.Broadcast(AbilityType);
 
 	bWaitingForEquipSelection = true;
+
+	// 선택한 Spell Globe의 Status
+	const FGameplayTag SelectedStatus = GetAuraASC()->GetStautusFromAbilityTag(SelectedAbility.Ability);
+	if (SelectedStatus.MatchesTagExact(FAuraGameplayTags::Get().Abilities_Status_Equipped))
+	{
+		// 선택한 Spell Globe의 InputTag.
+		SelectedSlot = GetAuraASC()->GetInputTagFromAbilityTag(SelectedAbility.Ability);
+	}
+}
+
+void USpellMenuWidgetController::EquippedSpellRowGlobePressed(const FGameplayTag& SlotTag, const FGameplayTag& AbilityType)
+{
+	// Equip버튼을 누르지 않았을 경우.
+	if (!bWaitingForEquipSelection) return;
+
+	// 선택한 Spell의 AbilityType(Offensive or Passive)
+	const FGameplayTag& SelectedAbilityType = AbilityInfo->FindAbilityInfoForTag(SelectedAbility.Ability).AbilityType;
+	
+	// EquippedSpellRow에서 선택한 AbilityType과 선택한 Spell의 AbilityType이 다르면 - Ex) Offensive Spell을 선택하고, Passive Spell에 장착하려함.
+	if (!SelectedAbilityType.MatchesTagExact(AbilityType)) return;
+	
+	GetAuraASC()->ServerEquipAbility(SelectedAbility.Ability, SlotTag);
+}
+
+void USpellMenuWidgetController::OnAbilityEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& Status, const FGameplayTag& Slot, const FGameplayTag& PrevSlot)
+{
+	bWaitingForEquipSelection = false;
+
+	FAuraAbilityInfo LastSlotInfo;
+	LastSlotInfo.StatusTag = FAuraGameplayTags::Get().Abilities_Status_UnLocked;
+	LastSlotInfo.InputTag = PrevSlot;
+	LastSlotInfo.AbilityTag = FAuraGameplayTags::Get().Abilities_None;
+
+	// 이전에 이미 Ability가 장착돼있던 Slot에 Ability를 장착하려는 경우에만 빈 AbilityInfo를 Broadcast함.
+	AbilityInfoDelegate.Broadcast(LastSlotInfo);
+
+	// 장착하려는 Ability.
+	FAuraAbilityInfo Info = AbilityInfo->FindAbilityInfoForTag(AbilityTag);
+	Info.StatusTag = Status;
+	Info.InputTag = Slot;
+
+	AbilityInfoDelegate.Broadcast(Info);
+
+	// Selection 애니메이션 중지.
+	StopWaitForEquipSelectionDelegate.Broadcast(AbilityInfo->FindAbilityInfoForTag(AbilityTag).AbilityType);
+	SpellGlobeReassigned.Broadcast(AbilityTag);
+	GlobeDeselect();
 }
 
 void USpellMenuWidgetController::ShouldEnableButton(const FGameplayTag& StatusTag, int32 SpellPoint, bool& bShouldEnableSpellPointButton, bool& bShouldEnableEquippedButton)

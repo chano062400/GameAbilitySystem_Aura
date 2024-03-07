@@ -6,6 +6,7 @@
 #include "AbilitySystem/Data/AbilityInfo.h"
 #include "Player/AuraPlayerState.h"
 #include "AbilitySystem/Data/LevelUpInfo.h"
+#include "AuraGameplayTags.h"
 
 void UOverlayWidgetController::BroadcastInitialValues()
 {
@@ -63,6 +64,8 @@ void UOverlayWidgetController::BindCallbacksToDependencies() // Attribute가 변경
 
 	if (GetAuraASC())
 	{
+		GetAuraASC()->AbilityEquippedDelegate.AddUObject(this, &UOverlayWidgetController::OnAbilityEquipped);
+
 		if (GetAuraASC()->bStartUpAbilitiesGiven) // Startup Ability가 부여된 경우
 		{
 			BroadcastAbilityInfo();
@@ -120,5 +123,23 @@ void UOverlayWidgetController::OnXPChanged(int32 NewXP)
 		OnXPPercentChangedDelegate.Broadcast(XPBarPercent);
 	}
 
+}
+
+void UOverlayWidgetController::OnAbilityEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& Status, const FGameplayTag& Slot, const FGameplayTag& PrevSlot)
+{
+	FAuraAbilityInfo LastSlotInfo;
+	LastSlotInfo.StatusTag = FAuraGameplayTags::Get().Abilities_Status_UnLocked;
+	LastSlotInfo.InputTag = PrevSlot;
+	LastSlotInfo.AbilityTag = FAuraGameplayTags::Get().Abilities_None;
+
+	// 이전에 이미 Ability가 장착돼있던 Slot에 Ability를 장착하려는 경우에만 빈 AbilityInfo를 Broadcast함.
+	AbilityInfoDelegate.Broadcast(LastSlotInfo);
+
+	// 장착하려는 Ability.
+	FAuraAbilityInfo Info = AbilityInfo->FindAbilityInfoForTag(AbilityTag);
+	Info.StatusTag = Status;
+	Info.InputTag = Slot;
+
+	AbilityInfoDelegate.Broadcast(Info);
 }
 

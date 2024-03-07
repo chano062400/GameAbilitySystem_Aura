@@ -134,6 +134,26 @@ FGameplayTag UAuraAbilitySystemComponent::GetStatusFromSpec(const FGameplayAbili
 	return FGameplayTag();
 }
 
+FGameplayTag UAuraAbilitySystemComponent::GetStautusFromAbilityTag(const FGameplayTag& AbilityTag)
+{
+	if (const FGameplayAbilitySpec* Spec = GetSpecFromAbilityTag(AbilityTag))
+	{
+		return GetStatusFromSpec(*Spec);
+	}
+
+	return FGameplayTag();
+}
+
+FGameplayTag UAuraAbilitySystemComponent::GetInputTagFromAbilityTag(const FGameplayTag& AbilityTag)
+{
+	if (const FGameplayAbilitySpec* Spec = GetSpecFromAbilityTag(AbilityTag))
+	{
+		return GetInputTagFromSpec(*Spec);
+	}
+
+	return FGameplayTag();
+}
+
 void UAuraAbilitySystemComponent::UpgradeAttribute(const FGameplayTag& AttributeTag)
 {
 	if (GetAvatarActor()->Implements<UPlayerInterface>())
@@ -164,6 +184,7 @@ FGameplayAbilitySpec* UAuraAbilitySystemComponent::GetSpecFromAbilityTag(const F
 	/** Used to stop us from removing abilities from an ability system component while we're iterating through the abilities */
 	FScopedAbilityListLock ActiveScopeLoc(*this);
 
+	// Give Ability를 해서 등록된 Ability들.
 	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
 		// 해당 Ability가 갖고있는 Tag
@@ -242,6 +263,44 @@ void UAuraAbilitySystemComponent::ServerSpendPoint_Implementation(const FGamepla
 	}
 }
 
+void UAuraAbilitySystemComponent::ServerEquipAbility_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& Slot)
+{
+	if (FGameplayAbilitySpec* AbilitySpec = GetSpecFromAbilityTag(AbilityTag))
+	{
+		const FGameplayTag& PrevSlot = GetInputTagFromSpec(*AbilitySpec); 
+		const FGameplayTag& Status = GetStatusFromSpec(*AbilitySpec);
+
+		// Status가 Equipped or UnLocked여야 장착가능.
+		const bool bValidStatus = Status == FAuraGameplayTags::Get().Abilities_Status_UnLocked || Status == FAuraGameplayTags::Get().Abilities_Status_Equipped;
+
+		if (bValidStatus)
+		{
+			// 해당 InputTag(Slot)를 가진 모든 Ability의 InputTag 제거.
+			ClearAbilitiesOfSlot(Slot);
+
+			// 혹시 모르는 경우에 대비해 해당 Ability의 InputTag 제거. Ex) 다른 Slot에 이미 장착돼있는 경우.
+			ClearSlot(AbilitySpec);
+
+			// 원하는 InputTag(Slot)를 할당.
+			AbilitySpec->DynamicAbilityTags.AddTag(Slot);
+
+			// 장착했으므로, UnLocked였던 Ability는 Equipped Status로 변경해줘야 함. 
+			if (Status.MatchesTagExact(FAuraGameplayTags::Get().Abilities_Status_UnLocked))
+			{
+				AbilitySpec->DynamicAbilityTags.RemoveTag(FAuraGameplayTags::Get().Abilities_Status_UnLocked);
+				AbilitySpec->DynamicAbilityTags.AddTag(FAuraGameplayTags::Get().Abilities_Status_Equipped);
+			}
+			MarkAbilitySpecDirty(*AbilitySpec);
+		}
+		ClientEquipAbility(AbilityTag, FAuraGameplayTags::Get().Abilities_Status_Equipped, Slot, PrevSlot);
+	}
+}
+
+void UAuraAbilitySystemComponent::ClientEquipAbility_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& Status, const FGameplayTag& Slot, const FGameplayTag& PrevSlot)
+{
+	AbilityEquippedDelegate.Broadcast(AbilityTag, Status, Slot, PrevSlot);
+}
+
 bool UAuraAbilitySystemComponent::GetDescriptionByAbilityTag(const FGameplayTag& AbilityTag, FString& OutDescription, FString& OutNextLevelDescription)
 {
 	if (const FGameplayAbilitySpec* AbilitySpec = GetSpecFromAbilityTag(AbilityTag))
@@ -268,6 +327,41 @@ bool UAuraAbilitySystemComponent::GetDescriptionByAbilityTag(const FGameplayTag&
 	}
 	
 	OutNextLevelDescription = FString();
+	return false;
+}
+
+void UAuraAbilitySystemComponent::ClearSlot(FGameplayAbilitySpec* Spec)
+{
+	const FGameplayTag Slot = GetInputTagFromSpec(*Spec);
+	Spec->DynamicAbilityTags.RemoveTag(Slot);
+	// 강제 Replicate
+	MarkAbilitySpecDirty(*Spec);
+}
+
+void UAuraAbilitySystemComponent::ClearAbilitiesOfSlot(const FGameplayTag& Slot)
+{
+	FScopedAbilityListLock ActiveScopedLock(*this);
+
+	for (FGameplayAbilitySpec& Spec : GetActivatableAbilities())
+	{
+		// Ability가 장착돼있다면
+		if (AbilityHasSlot(&Spec, Slot))
+		{
+			ClearSlot(&Spec);
+		}
+	}
+}
+
+bool UAuraAbilitySystemComponent::AbilityHasSlot(FGameplayAbilitySpec* Spec, const FGameplayTag& Slot)
+{
+	for (FGameplayTag Tag : Spec->DynamicAbilityTags)
+	{
+		if (Tag.MatchesTagExact(Slot))
+		{
+			return true;
+		}
+	}
+
 	return false;
 }
 
