@@ -65,11 +65,8 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& TargetLocation, const 
 		
 		FAuraGameplayTags AuraGameplayTag = FAuraGameplayTags::Get();
 		
-		for (auto& pair : DamageTypes)
-		{
-			const float  ScaledDamage = pair.Value.GetValueAtLevel(GetAbilityLevel()); //  Scalable Float - Curve Table에서 AbilityLevel의 값 = Damage
-			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(EffectSpecHandle, pair.Key, ScaledDamage); // DamageTypes 중에서 Tag(Key값)를 찾아서 Damage 값을 설정.(Value값)
-		}
+		const float  ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel()); //  Scalable Float - Curve Table에서 AbilityLevel의 값 = Damage
+		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(EffectSpecHandle, DamageType, ScaledDamage); // DamageTypes 중에서 Tag(Key값)를 찾아서 Damage 값을 설정.(Value값)
 
 		AuraProjectile->DamageEffectSpecHandle = EffectSpecHandle;
 
