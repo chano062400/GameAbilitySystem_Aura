@@ -64,9 +64,27 @@ public:
 
 	bool IsBlockedHit() const { return bIsBlockedHit; }
 
+	bool IsSuccessDebuff() const { return bIsSuccessfulDebuff; }
+
+	float GetDebuffDamage() const { return DebuffDamage; }
+
+	float GetDebuffDuration() const { return DebuffDuration; }
+
+	float GetDebuffFrequency() const { return DebuffFrequency; }
+
+	TSharedPtr<FGameplayTag> GetDamageType() const { return DamageType; }
+
 	void SetIsCriticalHit(bool bInIsCriticalHit) { bIsCriticalHit = bInIsCriticalHit; }
 
 	void SetIsBlockedHit(bool bInIsBlockedHit) { bIsBlockedHit = bInIsBlockedHit; }
+
+	void SetIsSuccessDebuff(bool bInIsSuccessDebuff) { bIsSuccessfulDebuff = bInIsSuccessDebuff; }
+
+	void SetDebuffDamage(float InDebuffDamage) { DebuffDamage = InDebuffDamage; }
+
+	void SetDebuffDuration(float InDebuffDuration) { DebuffDuration = InDebuffDuration; }
+
+	void SetDebuffFrequency(float InDebuffFrequency) { DebuffFrequency = InDebuffFrequency; }
 
 	/** Creates a copy of this context, used to duplicate for later modifications */
 	virtual FAuraGameplayEffectContext* Duplicate() const
@@ -89,6 +107,20 @@ protected:
 	UPROPERTY()
 	bool bIsBlockedHit = false;
 
+	UPROPERTY()
+	bool bIsSuccessfulDebuff = false;
+
+	UPROPERTY()
+	float DebuffDamage = 0.f;
+	
+	UPROPERTY()
+	float DebuffDuration = 0.f;
+	
+	UPROPERTY()
+	float DebuffFrequency = 0.f;
+
+	// SharedPtr - GC 贸府 X, 磊悼 皋葛府 包府.
+	TSharedPtr<FGameplayTag> DamageType;
 };
 
 template<>

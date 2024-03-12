@@ -113,6 +113,8 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 
 	//Debuff
 
+	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
+
 	for (TTuple<FGameplayTag, FGameplayTag> Pair : FAuraGameplayTags::Get().DamageTypesToDebuffs)
 	{
 		const FGameplayTag& DamageType = Pair.Key;
@@ -134,7 +136,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 			const bool bApplyDebuff = FMath::RandRange(1, 100) < EffectiveDebuffChance;
 			if (bApplyDebuff)
 			{
-
+				UAuraAbilitySystemLibrary::SetIsSuccessDebuff(EffectContextHandle, bApplyDebuff);
 			}
 		}
 	}
@@ -166,7 +168,6 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 
 	//1 ~ 100 랜덤 값보다 Target의 BlockChange가 크다면 Block에 성공.
 	const bool bBlocked = FMath::RandRange(1, 100) < TargetBlockChance;
-	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
 	UAuraAbilitySystemLibrary::SetIsBlockedHit(EffectContextHandle, bBlocked);
 
 	Damage = bBlocked ? Damage / 2.f : Damage;
