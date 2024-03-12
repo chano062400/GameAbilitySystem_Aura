@@ -3,12 +3,14 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "GameplayEffectTypes.h"
+#include "AuraAbilityTypes.h"
 #include "AuraProjectile.generated.h"
 
 class USphereComponent;
 class UProjectileMovementComponent;
 class UNiagaraSystem;
 class USoundBase;
+
 
 UCLASS()
 class AURA_API AAuraProjectile : public AActor
@@ -23,7 +25,7 @@ public:
 		TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
 
 	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = true)) // 블루프린트 스폰 시 변수를 핀으로 노출할지 설정.
-	FGameplayEffectSpecHandle DamageEffectSpecHandle;
+	FDamageEffectParams DamageEffectParams;
 
 protected:
 	

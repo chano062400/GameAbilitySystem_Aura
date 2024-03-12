@@ -6,6 +6,8 @@
 #include "AbilitySystem/Abilities/AuraGameplayAbility.h"
 #include "AuraDamageGameplayAbility.generated.h"
 
+struct FDamageEffectParams;
+
 /**
  * 
  */
@@ -18,6 +20,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void CauseDamage(AActor* TargetActor);
+
+	FDamageEffectParams MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor) const;
 
 protected:
 

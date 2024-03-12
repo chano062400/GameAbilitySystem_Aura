@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "Aura/Public/AuraGameplayTags.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystem/AuraAbilitySystemLibrary.h"
 
 void UAuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
@@ -44,31 +45,8 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& TargetLocation, const 
 			GetOwningActorFromActorInfo(),
 			Cast<APawn>(GetOwningActorFromActorInfo()),
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-
-		const UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo();
-		FGameplayEffectContextHandle EffectContextHandle = SourceASC->MakeEffectContext();
 		
-		//AbilityInstanceNotReplicated, AbilityCDO, AbilityLevel 설정.
-		EffectContextHandle.SetAbility(this);
-		
-		EffectContextHandle.AddSourceObject(AuraProjectile);
-		
-		TArray<TWeakObjectPtr<AActor>> Actors;
-		Actors.Add(AuraProjectile);
-		EffectContextHandle.AddActors(Actors);
-		
-		FHitResult HitResult;
-		HitResult.Location = TargetLocation;
-		EffectContextHandle.AddHitResult(HitResult);
-
-		const FGameplayEffectSpecHandle EffectSpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), EffectContextHandle);
-		
-		FAuraGameplayTags AuraGameplayTag = FAuraGameplayTags::Get();
-		
-		const float  ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel()); //  Scalable Float - Curve Table에서 AbilityLevel의 값 = Damage
-		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(EffectSpecHandle, DamageType, ScaledDamage); // DamageTypes 중에서 Tag(Key값)를 찾아서 Damage 값을 설정.(Value값)
-
-		AuraProjectile->DamageEffectSpecHandle = EffectSpecHandle;
+		AuraProjectile->DamageEffectParams = MakeDamageEffectParamsFromClassDefaults(nullptr);
 
 		AuraProjectile->FinishSpawning(SpawnTransform);
 	}

@@ -11,6 +11,8 @@
 #include "Interaction/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "UI/WidgetController/AuraWidgetController.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AuraGameplayTags.h"
 
 //Cast에 실패할 수도 있기 때문에 bool반환.
 //AAuraHUD*& - AAuraHUD포인터를 참조하는 것.
@@ -185,6 +187,29 @@ bool UAuraAbilitySystemLibrary::IsFriend(AActor* FirstActor, AActor* SecondActor
 {
 	// 둘다 Player거나 Enemy라면 true이므로 서로 공격못하게 설정, false라면 서로 다르므로 서로 공격가능하게 설정. 
 	return FirstActor->ActorHasTag(FName("Player")) == SecondActor->ActorHasTag(FName("Player"));
+}
+
+FGameplayEffectContextHandle UAuraAbilitySystemLibrary::ApplyDamageEffect(const FDamageEffectParams& DamageEffectParams)
+{
+	const AActor* SourceAvatarActor = DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
+
+	FGameplayEffectContextHandle EffectContextHandle = DamageEffectParams.SourceAbilitySystemComponent->MakeEffectContext();
+	EffectContextHandle.AddSourceObject(SourceAvatarActor);
+
+	FGameplayEffectSpecHandle SpecHandle = DamageEffectParams.SourceAbilitySystemComponent->MakeOutgoingSpec(
+		DamageEffectParams.DamageGameplayEffectClass, 
+		DamageEffectParams.AbilityLevel,
+		EffectContextHandle);
+
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, DamageEffectParams.DamageType, DamageEffectParams.BasedDamage);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, FAuraGameplayTags::Get().Debuff_Chance, DamageEffectParams.DebuffChance);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, FAuraGameplayTags::Get().Debuff_Damage, DamageEffectParams.DebuffChance);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, FAuraGameplayTags::Get().Debuff_Duration, DamageEffectParams.DebuffDuration);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, FAuraGameplayTags::Get().Debuff_Frequency, DamageEffectParams.DebuffFrequency);
+	
+	DamageEffectParams.TargetAbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
+
+	return EffectContextHandle;
 }
 
 int32 UAuraAbilitySystemLibrary::GetXPRewardForClassAndLevel(const UObject* WorldContextObject, ECharacterClass CharacterClass, int32 CharacterLevel)
