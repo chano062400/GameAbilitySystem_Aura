@@ -7,6 +7,7 @@
 #include "Components/TimelineComponent.h"
 #include "AuraGameplayTags.h"
 #include "Kismet/GameplayStatics.h"
+#include "AbilitySystem/DebuffNiagaraComponent.h"
 
 AAuraCharacterBase::AAuraCharacterBase()
 {
@@ -18,6 +19,9 @@ AAuraCharacterBase::AAuraCharacterBase()
 
 	DissolveTimeline = CreateDefaultSubobject<UTimelineComponent>("Dissolve Timeline");
 
+	BurnDebuffComponent = CreateDefaultSubobject<UDebuffNiagaraComponent>("BurnDebuffComponent");
+	BurnDebuffComponent->SetupAttachment(GetRootComponent());
+	BurnDebuffComponent->DebuffTag = FAuraGameplayTags::Get().Debuff_Burn;
 }
 
 void AAuraCharacterBase::HighlightActor()
@@ -60,6 +64,8 @@ void AAuraCharacterBase::MulticastHandleDeath_Implementation()
 	Dissolve();
 
 	bDead = true;
+
+	OnDeath.Broadcast(this);
 }
 
 void AAuraCharacterBase::BeginPlay()
@@ -142,6 +148,16 @@ int32 AAuraCharacterBase::GetMinionCount_Implementation()
 void AAuraCharacterBase::UpdateMinionCount_Implementation(int32 Amount)
 {
 	MinionCount += Amount;
+}
+
+FOnASCRegistered AAuraCharacterBase::GetOnASCRegisteredDelegate()
+{
+	return OnASCRegistered;
+}
+
+FOnDeath AAuraCharacterBase::GetOnDeathDelegate()
+{
+	return OnDeath;
 }
 
 void AAuraCharacterBase::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const

@@ -32,6 +32,9 @@ protected:
 	FGameplayTag DamageType;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	FScalableFloat Damage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	float DebuffChance = 20.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
@@ -42,7 +45,8 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	float DebuffDuration = 5.f;
-
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
-	FScalableFloat Damage;
+	float DeathImpulseMagnitude = 60.f;
+
 };

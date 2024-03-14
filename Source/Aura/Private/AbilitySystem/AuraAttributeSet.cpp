@@ -260,7 +260,6 @@ void UAuraAttributeSet::Debuff(const FEffectProperties& Props)
 
 		Props.TargetASC->ApplyGameplayEffectSpecToSelf(*Spec);
 	}
-
 }
 
 void UAuraAttributeSet::ShowFloatingText(const FEffectProperties Props, float Damage, bool bIsBlockedHit, bool bIsCriticalHit) const
