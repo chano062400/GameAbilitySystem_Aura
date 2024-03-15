@@ -162,13 +162,20 @@ void UAuraAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 			FGameplayTagContainer TagContainer;
 			TagContainer.AddTag(FAuraGameplayTags::Get().Effect_HitReact);
 			Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+
+			const FVector& KnockbackForce = UAuraAbilitySystemLibrary::GetKnockbackForce(Props.EffectContextHandle);
+			if (!KnockbackForce.IsNearlyZero(1.f))
+			{
+				Props.TargetCharacter->LaunchCharacter(KnockbackForce, true, true);
+			}
 		}
 		else
 		{
 			TScriptInterface<ICombatInterface> Interface = TScriptInterface<ICombatInterface>(Props.TargetAvatarActor);
 			if (Interface)
 			{
-				Interface->Die();
+				FVector DeathImpulse = UAuraAbilitySystemLibrary::GetDeathImpulse(Props.EffectContextHandle);
+				Interface->Die(DeathImpulse);
 			}
 			SendXPEvent(Props);
 		}
@@ -228,7 +235,7 @@ void UAuraAttributeSet::Debuff(const FEffectProperties& Props)
 	const float DebuffFrequency = UAuraAbilitySystemLibrary::GetDebuffFrequency(Props.EffectContextHandle);
 
 	// GetTransientPackage() -'절대 저장해서는 안되는 객체를 임시로 저장하는 데 유용한 최상위 패키지를 반환합니다' 
-	// 동적으로 GameplayEffect를 생성.
+	// 동적으로 GameplayEffect를 생성. - Replication X
 	UGameplayEffect* Effect = NewObject<UGameplayEffect>(GetTransientPackage(), FName(DebuffName));
 
 	Effect->DurationPolicy = EGameplayEffectDurationType::HasDuration;
