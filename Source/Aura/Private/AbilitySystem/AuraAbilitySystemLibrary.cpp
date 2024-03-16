@@ -286,6 +286,58 @@ FGameplayEffectContextHandle UAuraAbilitySystemLibrary::ApplyDamageEffect(const 
 	return EffectContextHandle;
 }
 
+TArray<FVector> UAuraAbilitySystemLibrary::EvenlyRotateVectors(const FVector& Forward, const FVector& Axis, float Spread, int32 NumOfVectors)
+{
+	TArray<FVector> Vectors;
+
+	const FVector LeftOfSpread = Forward.RotateAngleAxis(-Spread / 2.f, FVector::UpVector);
+
+	/*NumOfProjectiles = FMath::Min(GetAbilityLevel(), MaxNumOfProjectiles);*/
+
+	if (NumOfVectors > 1)
+	{
+		// LeftOfSpeard에서부터 시작해서 오른쪽으로 회전하므로 -1을 해줘야함. Spread 90도에 발사체 2개라면 LeftOfSpread에 1개, 90도 회전해서 1개. Ex) 90 / (2 - 1)
+		const float DeltaSpread = Spread / (NumOfVectors - 1);
+		for (int32 i = 0; i < NumOfVectors; i++)
+		{
+			const FVector Direction = LeftOfSpread.RotateAngleAxis(DeltaSpread * i, FVector::UpVector);
+			Vectors.Add(Direction);
+		}
+	}
+	else
+	{
+		Vectors.Add(Forward);
+	}
+
+	return Vectors;
+}
+
+TArray<FRotator> UAuraAbilitySystemLibrary::EvenlySpacedRotators(const FVector& Forward, const FVector& Axis, float Spread, int32 NumOfRotators)
+{
+	TArray<FRotator> Rotators;
+
+	const FVector LeftOfSpread = Forward.RotateAngleAxis(-Spread / 2.f, FVector::UpVector);
+
+	/*NumOfProjectiles = FMath::Min(GetAbilityLevel(), MaxNumOfProjectiles);*/
+
+	if (NumOfRotators > 1)
+	{
+		// LeftOfSpeard에서부터 시작해서 오른쪽으로 회전하므로 -1을 해줘야함. Spread 90도에 발사체 2개라면 LeftOfSpread에 1개, 90도 회전해서 1개. Ex) 90 / (2 - 1)
+		const float DeltaSpread = Spread / (NumOfRotators - 1);
+		for (int32 i = 0; i < NumOfRotators; i++)
+		{
+			const FVector Direction = LeftOfSpread.RotateAngleAxis(DeltaSpread * i, FVector::UpVector);
+			Rotators.Add(Direction.Rotation());
+		}
+	}
+	else
+	{
+		Rotators.Add(Forward.Rotation());
+	}
+
+	return Rotators;
+}
+
 int32 UAuraAbilitySystemLibrary::GetXPRewardForClassAndLevel(const UObject* WorldContextObject, ECharacterClass CharacterClass, int32 CharacterLevel)
 {
 	UCharacterClassInfo* CharacterClassInfo = GetCharacterClassInfo(WorldContextObject);

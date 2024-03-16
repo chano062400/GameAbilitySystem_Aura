@@ -27,6 +27,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = true)) // 블루프린트 스폰 시 변수를 핀으로 노출할지 설정.
 	FDamageEffectParams DamageEffectParams;
 
+	UPROPERTY()
+	TObjectPtr<USceneComponent> HomingTargetComponent;
+
 protected:
 	
 	virtual void BeginPlay() override;

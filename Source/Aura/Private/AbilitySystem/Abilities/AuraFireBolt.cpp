@@ -1,5 +1,10 @@
 #include "AbilitySystem/Abilities/AuraFireBolt.h"
 #include "AuraGameplayTags.h"
+#include "Interaction/CombatInterface.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "AbilitySystem/AuraAbilitySystemLibrary.h"
+#include "Actor/AuraProjectile.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 
 FString UAuraFireBolt::GetDescription(int32 Level)
 {
@@ -100,3 +105,69 @@ FString UAuraFireBolt::GetNextLevelDescription(int32 NextLevel)
 		FMath::Min(NumOfProjectiles, NextLevel),
 		ScaledDamage);
 }
+
+void UAuraFireBolt::SpawnProjectiles(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag, bool bOverridePitch, float PitchOverride, AActor* HomingTarget)
+{
+	const bool bIsServer = GetAvatarActorFromActorInfo()->HasAuthority();
+	if (!bIsServer) return;
+
+	TScriptInterface<ICombatInterface> CombatInterface = TScriptInterface<ICombatInterface>(GetAvatarActorFromActorInfo());
+	if (CombatInterface)
+	{
+		const FVector SocketLocation = CombatInterface->Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), SocketTag);
+		FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
+		if (bOverridePitch)
+		{
+			Rotation.Pitch = PitchOverride;
+		}
+
+		const FVector Forward = Rotation.Vector();
+		const int32 EffectiveNumOfProjectiles = FMath::Min(MaxNumOfProjectiles, GetAbilityLevel());
+		TArray<FRotator> Rotators = UAuraAbilitySystemLibrary::EvenlySpacedRotators(Forward, FVector::UpVector, ProjectileSpread, EffectiveNumOfProjectiles);
+
+		for (const FRotator& Rot : Rotators)
+		{
+			FTransform SpawnTransform;
+			SpawnTransform.SetLocation(SocketLocation);
+			SpawnTransform.SetRotation(Rot.Quaternion());
+
+			AAuraProjectile* Projectile = GetWorld()->SpawnActorDeferred<AAuraProjectile>
+				(
+					ProjectileClass,
+					SpawnTransform,
+					GetOwningActorFromActorInfo(),
+					Cast<APawn>(GetOwningActorFromActorInfo()),
+					ESpawnActorCollisionHandlingMethod::AlwaysSpawn
+				);
+
+			Projectile->DamageEffectParams = MakeDamageEffectParamsFromClassDefaults(nullptr);
+
+			if (IsValid(HomingTarget) && HomingTarget->Implements<UCombatInterface>())
+			{
+				/**
+				* The current target we are homing towards. Can only be set at runtime (when projectile is spawned or updating).
+				* @see bIsHomingProjectile
+				*/
+				Projectile->ProjectileMovement->HomingTargetComponent = HomingTarget->GetRootComponent();
+			}
+			else
+			{
+				Projectile->HomingTargetComponent = NewObject<USceneComponent>(USceneComponent::StaticClass());
+				Projectile->HomingTargetComponent->SetWorldLocation(ProjectileTargetLocation);
+				Projectile->ProjectileMovement->HomingTargetComponent = Projectile->HomingTargetComponent;
+			}
+			/** The magnitude of our acceleration towards the homing target. Overall velocity magnitude will still be limited by MaxSpeed. */
+			Projectile->ProjectileMovement->HomingAccelerationMagnitude = FMath::FRandRange(HomingAccelerationMin, HomingAccelerationMax);
+			
+			/**
+			* If true, we will accelerate toward our homing target. HomingTargetComponent must be set after the projectile is spawned.
+			* @see HomingTargetComponent, HomingAccelerationMagnitude
+			*/
+			Projectile->ProjectileMovement->bIsHomingProjectile = bLaunchHomingProjectiles;
+			Projectile->FinishSpawning(SpawnTransform);
+		}
+	}
+
+	
+}
+ 
