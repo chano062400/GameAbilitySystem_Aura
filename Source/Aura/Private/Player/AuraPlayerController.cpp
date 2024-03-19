@@ -121,8 +121,9 @@ void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 	{
 		bTargeting = ThisActor ? true : false; // ThisActor가 nullptr이 아니라면 적을 클릭했다는 것.
 		bAutoRunning = false;
-	}
 
+	}
+	if (GetASC()) GetASC()->AbilityInputTagPressed(InputTag);
 }
 
 void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)

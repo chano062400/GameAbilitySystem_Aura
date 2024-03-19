@@ -9,6 +9,7 @@
 
 class UAnimMontage;
 class UNiagaraSystem;
+class UAbilitySystemComponent;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnASCRegistered, UAbilitySystemComponent*);
 
@@ -89,5 +90,8 @@ public:
 	virtual	FOnASCRegistered GetOnASCRegisteredDelegate() = 0;
 
 	virtual FOnDeath GetOnDeathDelegate() = 0;
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void SetInShockLoop(bool bInShockLoop);
 };
 	
