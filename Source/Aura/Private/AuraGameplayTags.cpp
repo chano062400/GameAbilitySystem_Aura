@@ -360,5 +360,26 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 		FString("FireBolt Cooldwon Tag")
 	);
 
+	// Player Tags
+
+	GameplayTags.Player_Block_InputPressed = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Block.InputPressed"),
+		FString("Block Input Pressed Callback")
+	);
+	
+	GameplayTags.Player_Block_InputHeld = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Block.InputHeld"),
+		FString("Block Input Held Callback")
+	);
+	
+	GameplayTags.Player_Block_InputReleased = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Block.InputReleased"),
+		FString("Block Input Released Callback")
+	);
+	
+	GameplayTags.Player_Block_CursorTrace = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Block.CursorTrace"),
+		FString("Block CursorTracing")
+	);
 
 }
