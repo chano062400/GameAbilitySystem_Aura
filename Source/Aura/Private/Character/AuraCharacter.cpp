@@ -157,6 +157,11 @@ int32 AAuraCharacter::GetPlayerLevel_Implementation()
 	return AuraPlayerState->GetPlayerLevel();
 }
 
+USkeletalMeshComponent* AAuraCharacter::GetWeapon_Implementation()
+{
+	return Weapon;
+}
+
 void AAuraCharacter::InitAbilityActorInfo()
 {
 	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();

@@ -56,6 +56,8 @@ public:
 
 	virtual int32 GetPlayerLevel_Implementation() override;
 
+	virtual USkeletalMeshComponent* GetWeapon_Implementation() override;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UNiagaraComponent> LevelUpNiagaraComponent;
 
