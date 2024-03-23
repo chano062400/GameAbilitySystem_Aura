@@ -20,6 +20,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void StoreOwnerPlayerController();
 
+	UFUNCTION(BlueprintCallable)
+	void TraceFirstTarget(const FVector& BeamTargetLocation);
+
 protected:
 
 	UPROPERTY(BlueprintReadWrite, Category = "Beam")
@@ -30,4 +33,10 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, Category = "Beam")
 	TObjectPtr<APlayerController> OwnerPlayerController;
+	
+	UPROPERTY(BlueprintReadWrite, Category = "Beam")
+	TObjectPtr<ACharacter> OwnerCharacter;
+
+	UPROPERTY(EditAnywhere)
+	bool bShowDebug = true;
 };
