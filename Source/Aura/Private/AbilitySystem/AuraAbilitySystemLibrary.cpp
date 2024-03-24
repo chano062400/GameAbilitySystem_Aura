@@ -254,6 +254,45 @@ void UAuraAbilitySystemLibrary::GetLivePlayersWithInRadius(const UObject* WorldC
 	}
 }
 
+void UAuraAbilitySystemLibrary::GetClosestTargets(int32 MaxNumOfTargets, const TArray<AActor*>& Actors, TArray<AActor*>& OutClosestTargets, const FVector& Origin)
+{
+	if (MaxNumOfTargets >= Actors.Num())
+	{
+		OutClosestTargets = Actors;
+		return;
+	}
+	else
+	{
+		TArray<AActor*> ActorsToCheck = Actors;
+		
+		int32 NumOfAddtionalTargets = 0;
+		
+
+		while (NumOfAddtionalTargets < MaxNumOfTargets)
+		{
+			if (ActorsToCheck.Num() == 0) break;
+			
+			double ClosestDist = TNumericLimits<double>::Max();
+			AActor* ClosestActor;
+			for (AActor* Actor : ActorsToCheck)
+			{
+				if (Actor->ActorHasTag(FName("Player"))) continue;
+
+				const double Dist = (Actor->GetActorLocation() - Origin).Length();
+				if (ClosestDist > Dist)
+				{
+					ClosestDist = Dist;
+					ClosestActor = Actor;
+				}
+			}
+
+			ActorsToCheck.Remove(ClosestActor);
+			OutClosestTargets.AddUnique(ClosestActor);
+			++NumOfAddtionalTargets;
+		}
+	}
+}
+
 bool UAuraAbilitySystemLibrary::IsFriend(AActor* FirstActor, AActor* SecondActor)
 {
 	// 둘다 Player거나 Enemy라면 true이므로 서로 공격못하게 설정, false라면 서로 다르므로 서로 공격가능하게 설정. 

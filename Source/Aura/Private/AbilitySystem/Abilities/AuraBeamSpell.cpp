@@ -2,6 +2,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/Character.h"
 #include "Interaction/CombatInterface.h"
+#include "AbilitySystem/AuraAbilitySystemLibrary.h"
 
 void UAuraBeamSpell::StoreMouseDataInfo(const FHitResult& MouseHitResult)
 {
@@ -59,4 +60,29 @@ void UAuraBeamSpell::TraceFirstTarget(const FVector& BeamTargetLocation)
 			}
 		}
 	}
+}
+
+void UAuraBeamSpell::StoreAdditionalTargets(TArray<AActor*>& OutAdditionalTargets)
+{
+	TArray<AActor*> OverlappingActors;
+	TArray<AActor*> ActorsToIgnore;
+
+	// 자기 자신과 First Target은 무시.
+	ActorsToIgnore.Add(GetAvatarActorFromActorInfo());
+	ActorsToIgnore.Add(MouseHitActor);
+
+	// MouseTarget을 기준으로 Radius안에 있는 Overlapping Targets를 가져옴.
+	UAuraAbilitySystemLibrary::GetLivePlayersWithInRadius(GetAvatarActorFromActorInfo(), 
+		OverlappingActors, 
+		ActorsToIgnore,
+		850.f,
+		MouseHitActor->GetActorLocation()
+		);
+
+	// int32 NumOfAdditionalTargets = FMath::Min(GetAbilityLevel() - 1, MAxNumOfTargets);
+	int32 NumOfAdditionalTargets = 5;
+
+	// Overlapping Targets중 AdditionalTargets를 가까운 순서대로 가져옴.
+	UAuraAbilitySystemLibrary::GetClosestTargets(NumOfAdditionalTargets, OverlappingActors, OutAdditionalTargets, MouseHitActor->GetActorLocation());
+
 }

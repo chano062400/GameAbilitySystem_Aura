@@ -23,6 +23,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void TraceFirstTarget(const FVector& BeamTargetLocation);
 
+	UFUNCTION(BlueprintCallable)
+	void StoreAdditionalTargets(TArray<AActor*>& OutAdditionalTargets);
+
 protected:
 
 	UPROPERTY(BlueprintReadWrite, Category = "Beam")
@@ -39,4 +42,7 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	bool bShowDebug = true;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Beam")
+	int32 MAxNumOfTargets = 5;
 };
