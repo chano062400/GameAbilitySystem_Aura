@@ -60,7 +60,7 @@ public:
 
 	virtual FOnASCRegistered GetOnASCRegisteredDelegate() override;
 
-	virtual FOnDeath GetOnDeathDelegate() override;
+	virtual FOnDeath& GetOnDeathDelegate() override;
 
 	FOnASCRegistered OnASCRegistered;
 

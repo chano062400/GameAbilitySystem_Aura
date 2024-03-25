@@ -60,6 +60,14 @@ void UAuraBeamSpell::TraceFirstTarget(const FVector& BeamTargetLocation)
 			}
 		}
 	}
+	if (TScriptInterface<ICombatInterface> Interface = TScriptInterface<ICombatInterface>(MouseHitActor))
+	{
+		// IsAlreadyBound - 특정 함수가 Bind돼있는지 확인.
+		if (!Interface->GetOnDeathDelegate().IsAlreadyBound(this, &UAuraBeamSpell::FirstTargetDead))
+		{
+			Interface->GetOnDeathDelegate().AddDynamic(this, &UAuraBeamSpell::FirstTargetDead);
+		}
+	}
 }
 
 void UAuraBeamSpell::StoreAdditionalTargets(TArray<AActor*>& OutAdditionalTargets)
@@ -85,4 +93,14 @@ void UAuraBeamSpell::StoreAdditionalTargets(TArray<AActor*>& OutAdditionalTarget
 	// Overlapping Targets중 AdditionalTargets를 가까운 순서대로 가져옴.
 	UAuraAbilitySystemLibrary::GetClosestTargets(NumOfAdditionalTargets, OverlappingActors, OutAdditionalTargets, MouseHitActor->GetActorLocation());
 
+	for (AActor* Actor : OutAdditionalTargets)
+	{
+		if (TScriptInterface<ICombatInterface> Interface = TScriptInterface<ICombatInterface>(Actor))
+		{
+			if (!Interface->GetOnDeathDelegate().IsAlreadyBound(this, &UAuraBeamSpell::AdditionalTargetDead))
+			{
+				Interface->GetOnDeathDelegate().AddDynamic(this, &UAuraBeamSpell::AdditionalTargetDead);
+			}
+		}
+	}
 }

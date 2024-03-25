@@ -5,6 +5,7 @@
 
 void UAuraDamageGameplayAbility::CauseDamage(AActor* TargetActor)
 {
+	if(GetAbilitySystemComponentFromActorInfo() == nullptr || !IsValid(TargetActor)) return;
 	FGameplayEffectSpecHandle DamageSpecHandle = MakeOutgoingGameplayEffectSpec(DamageEffectClass, 1);
 
 	const float DamageMagnitude = Damage.GetValueAtLevel(GetAbilityLevel());
