@@ -5,14 +5,15 @@
 
 void UAuraDamageGameplayAbility::CauseDamage(AActor* TargetActor)
 {
-	if(GetAbilitySystemComponentFromActorInfo() == nullptr || !IsValid(TargetActor)) return;
 	FGameplayEffectSpecHandle DamageSpecHandle = MakeOutgoingGameplayEffectSpec(DamageEffectClass, 1);
 
 	const float DamageMagnitude = Damage.GetValueAtLevel(GetAbilityLevel());
 	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, DamageType, DamageMagnitude);
 	
-	GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToTarget(*DamageSpecHandle.Data.Get(), UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor));
-
+	if (GetAbilitySystemComponentFromActorInfo() && IsValid(TargetActor))
+	{
+		GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToTarget(*DamageSpecHandle.Data.Get(), UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor));
+	}
 }
 
 FDamageEffectParams UAuraDamageGameplayAbility::MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor) const

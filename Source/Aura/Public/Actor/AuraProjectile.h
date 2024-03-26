@@ -22,7 +22,7 @@ public:
 	AAuraProjectile();
 
 	UPROPERTY(VisibleAnywhere)
-		TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
+	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
 
 	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = true)) // 블루프린트 스폰 시 변수를 핀으로 노출할지 설정.
 	FDamageEffectParams DamageEffectParams;
@@ -39,10 +39,10 @@ protected:
 
 	virtual void Destroyed() override;
 
-private:
-	
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TObjectPtr<USphereComponent> Sphere;
+
+private:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UNiagaraSystem> ImpactEffect;

@@ -87,8 +87,7 @@ void UAuraBeamSpell::StoreAdditionalTargets(TArray<AActor*>& OutAdditionalTarget
 		MouseHitActor->GetActorLocation()
 		);
 
-	// int32 NumOfAdditionalTargets = FMath::Min(GetAbilityLevel() - 1, MAxNumOfTargets);
-	int32 NumOfAdditionalTargets = 5;
+	int32 NumOfAdditionalTargets = FMath::Min(GetAbilityLevel() - 1, MAxNumOfTargets);
 
 	// Overlapping Targets중 AdditionalTargets를 가까운 순서대로 가져옴.
 	UAuraAbilitySystemLibrary::GetClosestTargets(NumOfAdditionalTargets, OverlappingActors, OutAdditionalTargets, MouseHitActor->GetActorLocation());
