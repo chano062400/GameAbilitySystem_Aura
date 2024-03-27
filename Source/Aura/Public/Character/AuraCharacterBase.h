@@ -25,6 +25,8 @@ public:
 
 	AAuraCharacterBase();
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	virtual void HighlightActor();
 	
 	virtual void UnHighlightActor();
@@ -69,6 +71,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TArray<FTaggedMontage> AttackMontage;
 
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	bool bIsStunned = false;
+
+	virtual void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 
 protected:
 
@@ -92,7 +98,10 @@ protected:
 	FName RightHandSocketName;
 
 	bool bDead = false;
-
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+	float BaseWalkSpeed = 250.f;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<USoundBase> DeathSound;
 

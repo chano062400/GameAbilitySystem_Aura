@@ -50,9 +50,6 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Combat")
 	bool bHitReacting = false;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
-	float BaseWalkSpeed = 250.f;
 	
 	virtual void Die(const FVector& DeathImpulse) override;
 

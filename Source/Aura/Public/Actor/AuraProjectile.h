@@ -39,7 +39,7 @@ protected:
 
 	virtual void Destroyed() override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite )
 	TObjectPtr<USphereComponent> Sphere;
 
 private:

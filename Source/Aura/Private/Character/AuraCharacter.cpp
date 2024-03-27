@@ -12,6 +12,7 @@
 #include "NiagaraComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "AuraGameplayTags.h"
 
 AAuraCharacter::AAuraCharacter()
 {
@@ -170,9 +171,10 @@ void AAuraCharacter::InitAbilityActorInfo()
 	Cast<UAuraAbilitySystemComponent>(AuraPlayerState->GetAbilitySystemComponent())->AbilityActorInfoSet();
 
 	AbilitySystemComponent = AuraPlayerState->GetAbilitySystemComponent();
+	AbilitySystemComponent->RegisterGameplayTagEvent(FAuraGameplayTags::Get().Debuff_Stun, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AAuraCharacter::StunTagChanged);
 	AttributeSet = AuraPlayerState->GetAttributeSet();
 	OnASCRegistered.Broadcast(AbilitySystemComponent);
-	
+
 	/* Assertion은 멀티 게임에서 로컬 플레이어의 PlayerController 말고도 다른 클라이언트들의 PlayerController가 유효하지 않으면 중단됨(모든 클라이언트의 PlayerController가 유효해야 진행)
 	그러나 우리는 단지 nullptr가 아니면 진행하고 싶으므로 if문으로 래핑함.*/ 
 	/*check(AuraPlayerController);*/
