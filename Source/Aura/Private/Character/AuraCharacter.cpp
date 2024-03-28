@@ -13,6 +13,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "AuraGameplayTags.h"
+#include "AbilitySystem/DebuffNiagaraComponent.h"
 
 AAuraCharacter::AAuraCharacter()
 {
@@ -161,6 +162,44 @@ int32 AAuraCharacter::GetPlayerLevel_Implementation()
 USkeletalMeshComponent* AAuraCharacter::GetWeapon_Implementation()
 {
 	return Weapon;
+}
+
+void AAuraCharacter::OnRep_bIsStunned()
+{
+	if (UAuraAbilitySystemComponent* AuraASC = Cast<UAuraAbilitySystemComponent>(GetAbilitySystemComponent()))
+	{
+		FGameplayTagContainer BlockedTags;
+		BlockedTags.AddTag(FAuraGameplayTags::Get().Player_Block_CursorTrace);
+		BlockedTags.AddTag(FAuraGameplayTags::Get().Player_Block_InputPressed);
+		BlockedTags.AddTag(FAuraGameplayTags::Get().Player_Block_InputHeld);
+		BlockedTags.AddTag(FAuraGameplayTags::Get().Player_Block_InputReleased);
+
+		if (bIsStunned)
+		{		
+			/*GameplayEffect에 의해 지원되지 않는 Loose GameplayTag를 추가할 수 있도록 허용합니다.
+			* 이렇게 추가한 Tag는 Replicate되지 않습니다! Replicate가 필요한 경우 이러한 기능의 'Replicated' 버전을 사용하십시오.
+			* 필요한 경우 이러한 태그가 클라이언트/서버에 추가되었는지 확인하는 것은 호출하는 GameCode에 달려 있습니다.*/
+			AuraASC->AddLooseGameplayTags(BlockedTags);
+			StunDebuffComponent->Activate();
+		}
+		else
+		{
+			AuraASC->RemoveLooseGameplayTags(BlockedTags);
+			StunDebuffComponent->Deactivate();
+		}
+	}
+}
+
+void AAuraCharacter::OnRep_bIsBurned()
+{
+	if (bIsBurned)
+	{
+		BurnDebuffComponent->Activate();
+	}
+	else
+	{
+		BurnDebuffComponent->Deactivate();
+	}
 }
 
 void AAuraCharacter::InitAbilityActorInfo()

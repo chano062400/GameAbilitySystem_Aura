@@ -60,7 +60,7 @@ public:
 
 	virtual void UpdateMinionCount_Implementation(int32 Amount) override;
 
-	virtual FOnASCRegistered GetOnASCRegisteredDelegate() override;
+	virtual FOnASCRegistered& GetOnASCRegisteredDelegate() override;
 
 	virtual FOnDeath& GetOnDeathDelegate() override;
 
@@ -71,8 +71,17 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TArray<FTaggedMontage> AttackMontage;
 
-	UPROPERTY(Replicated, BlueprintReadOnly)
+	UPROPERTY(ReplicatedUsing = OnRep_bIsStunned, BlueprintReadOnly)
 	bool bIsStunned = false;
+
+	UFUNCTION()
+	virtual void OnRep_bIsStunned();
+	
+	UPROPERTY(ReplicatedUsing = OnRep_bIsBurned, BlueprintReadOnly)
+	bool bIsBurned = false;
+
+	UFUNCTION()
+	virtual void OnRep_bIsBurned();
 
 	virtual void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 
@@ -169,6 +178,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UDebuffNiagaraComponent> BurnDebuffComponent;
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UDebuffNiagaraComponent> StunDebuffComponent;
 
 private:
 

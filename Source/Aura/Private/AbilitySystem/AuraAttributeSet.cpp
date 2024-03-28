@@ -242,7 +242,16 @@ void UAuraAttributeSet::Debuff(const FEffectProperties& Props)
 	Effect->DurationMagnitude = FScalableFloat(DebuffDuration);
 	Effect->Period = DebuffFrequency;
 	
-	Effect->InheritableOwnedTagsContainer.AddTag(FAuraGameplayTags::Get().DamageTypesToDebuffs[DamageType]);
+	const FGameplayTag DebuffTag = FAuraGameplayTags::Get().DamageTypesToDebuffs[DamageType];
+	Effect->InheritableOwnedTagsContainer.AddTag(DebuffTag);
+	if (DebuffTag.MatchesTagExact(FAuraGameplayTags::Get().Debuff_Stun))
+	{
+		/** These tags are applied to the actor I am applied to */
+		Effect->InheritableOwnedTagsContainer.AddTag(FAuraGameplayTags::Get().Player_Block_CursorTrace);
+		Effect->InheritableOwnedTagsContainer.AddTag(FAuraGameplayTags::Get().Player_Block_InputPressed);
+		Effect->InheritableOwnedTagsContainer.AddTag(FAuraGameplayTags::Get().Player_Block_InputHeld);
+		Effect->InheritableOwnedTagsContainer.AddTag(FAuraGameplayTags::Get().Player_Block_InputReleased);
+	}
 	
 	Effect->StackingType = EGameplayEffectStackingType::AggregateBySource; 
 	Effect->StackLimitCount = 1;

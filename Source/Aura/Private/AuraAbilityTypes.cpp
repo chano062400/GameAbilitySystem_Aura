@@ -139,7 +139,7 @@ bool FAuraGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 	}
 	if (RepBits & (1 << 13))
 	{
-		if (IsLoading())
+		if (Ar.IsLoading())
 		{
 			if (!DamageType.IsValid())
 			{

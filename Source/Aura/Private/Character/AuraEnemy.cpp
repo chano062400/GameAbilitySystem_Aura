@@ -47,6 +47,7 @@ void AAuraEnemy::PossessedBy(AController* NewController)
 	AuraAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), false);
 	AuraAIController->GetBlackboardComponent()->SetValueAsBool(FName("RangedAttacker"), CharacterClass != ECharacterClass::Warrior);
 	AuraAIController->GetBlackboardComponent()->SetValueAsBool(FName("IsDead"), false);
+	AuraAIController->GetBlackboardComponent()->SetValueAsBool(FName("IsStunned"), false);
 }
 
 void AAuraEnemy::HighlightActor()
@@ -156,6 +157,15 @@ void AAuraEnemy::InitAbilityActorInfo()
 
 	OnASCRegistered.Broadcast(AbilitySystemComponent);
 
+}
+
+void AAuraEnemy::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	Super::StunTagChanged(CallbackTag, NewCount);
+	if (AuraAIController && AuraAIController->GetBlackboardComponent())
+	{
+		AuraAIController->GetBlackboardComponent()->SetValueAsBool(FName("IsStunned"), bIsStunned);
+	}
 }
 
 void AAuraEnemy::InitializeDefaultAttributes() const

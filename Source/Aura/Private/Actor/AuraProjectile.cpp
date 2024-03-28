@@ -39,11 +39,15 @@ void AAuraProjectile::BeginPlay()
 
 	SetLifeSpan(LifeSpan);
 
+	SetReplicateMovement(true);
+
 	if (LoopingSound) LoopingSoundComponent = UGameplayStatics::SpawnSoundAttached(LoopingSound, GetRootComponent());
 }
 
 void AAuraProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OverlapActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromsweep, const FHitResult& HitResult)
 {
+	if (DamageEffectParams.SourceAbilitySystemComponent == nullptr) return;
+
 	AActor* SourceAvatarActor = DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
 	// 자기가 날린 Projectile에 피해를 입지 않도록.
 	if (OverlapActor == SourceAvatarActor) return;
