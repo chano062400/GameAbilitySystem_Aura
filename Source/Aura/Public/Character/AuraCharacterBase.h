@@ -64,6 +64,10 @@ public:
 
 	virtual FOnDeath& GetOnDeathDelegate() override;
 
+	virtual bool IsBeingShocked_Implementation() const override;
+
+	virtual void SetIsBeingShocked_Implementation(bool bInIsBeingShocked) override;
+
 	FOnASCRegistered OnASCRegistered;
 
 	FOnDeath OnDeath;
@@ -82,6 +86,9 @@ public:
 
 	UFUNCTION()
 	virtual void OnRep_bIsBurned();
+
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	bool bIsBeingShocked = false;
 
 	virtual void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 

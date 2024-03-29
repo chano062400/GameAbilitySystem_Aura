@@ -13,6 +13,7 @@
 #include "UI/WidgetController/AuraWidgetController.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AuraGameplayTags.h"
+#include "Interaction/PlayerInterface.h"
 
 //Cast에 실패할 수도 있기 때문에 bool반환.
 //AAuraHUD*& - AAuraHUD포인터를 참조하는 것.
@@ -20,6 +21,11 @@ bool UAuraAbilitySystemLibrary::MakeWidgetControllerParams(const UObject* WorldC
 {
 	if (APlayerController* PC = UGameplayStatics::GetPlayerController(WorldContextObject, 0))
 	{
+		// nullptr인 OutAuraHUD에 Cast<AAuraHUD>(PC->GetHUD())을 가리키는 주소값을 넣어버리는 것.
+		// OutAuraHUD = nullptr 
+		// OutAuraHUD = &(Cast<AAuraHUD>(PC->GetHUD()))인데, PC->GetHUD가 포인터(*)를 반환하므로 OutAuraHUD = Cast<AAuraHUD>(PC->GetHUD())가 되는 것.
+		// *OutAuraHUD = *(Cast<AAuraHUD>(PC->GetHUD())) == AAuraHUD
+		// 주소값을 변경하는 것이므로 매개변수가 AAuraHUD*였다면 변경된 다음 Stakc Frame이 끝나면 사라지기 때문에 변경이 되지 않음.
 		OutAuraHUD = Cast<AAuraHUD>(PC->GetHUD());
 		if (OutAuraHUD)
 		{
@@ -246,7 +252,7 @@ void UAuraAbilitySystemLibrary::GetLivePlayersWithInRadius(const UObject* WorldC
 		World->OverlapMultiByObjectType(Overlaps, SphereOrigin, FQuat::Identity, FCollisionObjectQueryParams(FCollisionObjectQueryParams::InitType::AllDynamicObjects), FCollisionShape::MakeSphere(Radius), SphereParams);
 		for (FOverlapResult& Overlap : Overlaps)
 		{
-			if (Overlap.GetActor()->Implements<UCombatInterface>() && !ICombatInterface::Execute_IsDead(Overlap.GetActor()))
+			if (Overlap.GetActor()->Implements<UCombatInterface>() && !ICombatInterface::Execute_IsDead(Overlap.GetActor()) && !Overlap.GetActor()->Implements<UPlayerInterface>())
 			{
 				OutOverlappingActors.AddUnique(ICombatInterface::Execute_GetAvatar(Overlap.GetActor()));
 			}
@@ -276,7 +282,7 @@ void UAuraAbilitySystemLibrary::GetClosestTargets(int32 MaxNumOfTargets, const T
 			AActor* ClosestActor;
 			for (AActor* Actor : ActorsToCheck)
 			{
-				if (Actor->ActorHasTag(FName("Player"))) continue;
+				if (Actor->ActorHasTag(FName("Player")) || !Actor->HasAuthority()) continue;
 
 				const double Dist = (Actor->GetActorLocation() - Origin).Length();
 				if (ClosestDist > Dist)
