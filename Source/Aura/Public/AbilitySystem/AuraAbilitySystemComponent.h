@@ -64,10 +64,31 @@ public:
 
 	void UpgradeAttribute(const FGameplayTag& AttributeTag);
 
+	FGameplayAbilitySpec* GetSpecFromAbilityTag(const FGameplayTag& AbilityTag);
+
+	bool SlotIsEmpty(const FGameplayTag& Slot);
+
+	static bool AbilityHasSlot(const FGameplayAbilitySpec& Spec, const FGameplayTag& Slot);
+
+	static bool AbilityHasAnySlot(FGameplayAbilitySpec* Spec);
+
+	FGameplayAbilitySpec* GetSpecWithSlot(const FGameplayTag& Slot);
+
+	bool IsPassiveAbility(const FGameplayAbilitySpec& Spec);
+
+	static void AssignSlotToAbility(FGameplayAbilitySpec& Spec, const FGameplayTag& Slot);
+
+	// 해당 Ability의 InputTag 제거
+	static void ClearSlot(FGameplayAbilitySpec* Spec);
+
+	// 해당 InputTag를 가진 모든 Ability의 InputTag 제거.
+	void ClearAbilitiesOfSlot(const FGameplayTag& Slot);
+
+	// Ability가 장착돼있는지 반환.
+	static bool AbilityHasSlot(FGameplayAbilitySpec* Spec, const FGameplayTag& Slot);
+
 	UFUNCTION(Server, Reliable)
 	void ServerUpgradeAttribute(const FGameplayTag& AttributeTag);
-
-	FGameplayAbilitySpec* GetSpecFromAbilityTag(const FGameplayTag& AbilityTag);
 
 	void UpdateAbilityStatuses(int32 Level);
 
@@ -81,15 +102,6 @@ public:
 	void ClientEquipAbility(const FGameplayTag& AbilityTag, const FGameplayTag& Status, const FGameplayTag& Slot, const FGameplayTag& PrevSlot);
 
 	bool GetDescriptionByAbilityTag(const FGameplayTag& AbilityTag, FString& OutDescription, FString& OutNextLevelDescription);
-
-	// 해당 Ability의 InputTag 제거
-	void ClearSlot(FGameplayAbilitySpec* Spec);
-
-	// 해당 InputTag를 가진 모든 Ability의 InputTag 제거.
-	void ClearAbilitiesOfSlot(const FGameplayTag& Slot);
-
-	// Ability가 장착돼있는지 반환.
-	static bool AbilityHasSlot(FGameplayAbilitySpec* Spec, const FGameplayTag& Slot);
 
 protected:
 
