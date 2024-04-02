@@ -1,7 +1,7 @@
 
 #include "AsyncTasks/WaitCooldownChange.h"
 #include "AbilitySystemComponent.h"
-
+#include "AuraGameplayTags.h"
 UWaitCooldownChange* UWaitCooldownChange::WaitForCooldownChange(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayTag& InCooldownTag)
 {
 	UWaitCooldownChange* WaitCooldownChange = NewObject<UWaitCooldownChange>();

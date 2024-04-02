@@ -374,6 +374,11 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 		FName("Cooldown.Fire.FireBolt"),
 		FString("FireBolt Cooldwon Tag")
 	);
+	
+	GameplayTags.Cooldown_None = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Cooldown.None"),
+		FString("None Cooldwon Tag")
+	);
 
 	// Player Tags
 
