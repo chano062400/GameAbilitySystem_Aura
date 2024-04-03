@@ -16,6 +16,8 @@ DECLARE_MULTICAST_DELEGATE_FourParams(FAbilityEquipped, const FGameplayTag& /*Ab
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FDeactivatePassiveAbility, const FGameplayTag& /*Ability Tag*/);
 
+DECLARE_MULTICAST_DELEGATE_TwoParams(FActivatePassiveEffect, const FGameplayTag& /*Ability Tag*/, bool /*bAcitvate*/);
+
 /**
  * 
  */
@@ -37,6 +39,8 @@ public:
 	FAbilityEquipped AbilityEquippedDelegate;
 
 	FDeactivatePassiveAbility DeactivatePassiveAbility;
+
+	FActivatePassiveEffect ActivatePassiveEffect;
 
 	bool bStartUpAbilitiesGiven = false;
 
@@ -86,6 +90,9 @@ public:
 
 	// Ability°¡ ÀåÂøµÅÀÖ´ÂÁö ¹ÝÈ¯.
 	static bool AbilityHasSlot(FGameplayAbilitySpec* Spec, const FGameplayTag& Slot);
+
+	UFUNCTION(NetMulticast, UnReliable)
+	void MulticastActivatePassiveEffect(const FGameplayTag& AbilityTag, bool bActivate);
 
 	UFUNCTION(Server, Reliable)
 	void ServerUpgradeAttribute(const FGameplayTag& AttributeTag);
