@@ -52,6 +52,10 @@ public:
 
 	virtual int32 GetSpellPoint_Implementation() const override;
 
+	virtual void ShowMagicCircle_Implementation(UMaterialInterface* DecalMaterial = nullptr) override;
+
+	virtual void HideMagicCircle_Implementation() override;
+
 	/* Combat interface */
 
 	virtual int32 GetPlayerLevel_Implementation() override;

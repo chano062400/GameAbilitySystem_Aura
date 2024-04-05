@@ -15,12 +15,13 @@ class UAuraAbilitySystemComponent;
 class USplineComponent;
 class UDamageTextComponent;
 class UNiagaraSystem;
+class AMagicCircle;
 
 /**
  * 
  */
 UCLASS()
-class AURA_API AAuraPlayerController : public APlayerController
+class AURA_API AAuraPlayerController : public APlayerController	
 {
 	GENERATED_BODY()
 	
@@ -32,6 +33,12 @@ public:
 
 	UFUNCTION(Client, Reliable)
 	void ShowDamageNumber(float Damage, ACharacter* TargetCharacter, bool bIsBlockedHit, bool bIsCriticalHit);
+
+	UFUNCTION(BlueprintCallable)
+	void ShowMagicCircle(UMaterialInterface* DecalMaterial = nullptr);
+
+	UFUNCTION(BlueprintCallable)
+	void HideMagicCircle();
 
 protected:
 
@@ -106,4 +113,12 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UDamageTextComponent> DamageTextComponentClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AMagicCircle> MagicCircleDecal;
+
+	UPROPERTY()
+	TObjectPtr<AMagicCircle> MagicCircle;
+
+	void UpdateMagicCircleLocation();
 };
