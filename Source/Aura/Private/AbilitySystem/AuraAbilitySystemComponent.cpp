@@ -88,6 +88,8 @@ void UAuraAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& In
 {
 	if (!InputTag.IsValid()) return;
 
+	FScopedAbilityListLock ActiveScopeLock(*this);
+
 	for (auto& AbilitySpec : GetActivatableAbilities()) //활성화 될 수 있는 Ability를 모두 가져옴.
 	{
 		if (AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag) && AbilitySpec.IsActive()) // InputTag를 가지고 있는 Ability인지 확인.

@@ -59,12 +59,12 @@ TArray<USceneComponent*> APointCollection::GetGroundPoints(const FVector& Ground
 
 	for (USceneComponent* Point : ImmutablePoints)
 	{
-		if (ArrayCopy.Num() > NumOfPoints) return ArrayCopy;
+		if (ArrayCopy.Num() >= NumOfPoints) return ArrayCopy;
 		
 		// Pt_0은 중심이기 때문에 회전할 필요가 없음.
 		if (Point != Pt_0)
 		{
-			FVector ToPoint = (Point->GetComponentLocation() - Pt_0->GetComponentLocation()).GetSafeNormal();
+			FVector ToPoint = (Point->GetComponentLocation() - Pt_0->GetComponentLocation());
 			ToPoint = ToPoint.RotateAngleAxis(YawOverride, FVector::UpVector);
 			Point->SetWorldLocation(Pt_0->GetComponentLocation() + ToPoint);
 		}
@@ -76,7 +76,7 @@ TArray<USceneComponent*> APointCollection::GetGroundPoints(const FVector& Ground
 		FHitResult HitResult;
 		// Player들을 무시하고 Spawn할 것이기 때문.
 		TArray<AActor*> IgnoreActors;
-		UAuraAbilitySystemLibrary::GetLivePlayersWithInRadius(this, IgnoreActors, TArray<AActor*>(), 1500, GetActorLocation());
+		UAuraAbilitySystemLibrary::GetLivePlayersWithInRadius(this, IgnoreActors, TArray<AActor*>(), 1500.f, GetActorLocation());
 
 		FCollisionQueryParams Params;
 		Params.AddIgnoredActors(IgnoreActors);
