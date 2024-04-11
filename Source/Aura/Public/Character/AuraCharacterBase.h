@@ -8,7 +8,6 @@
 #include "Components/TimelineComponent.h"
 #include "AuraCharacterBase.generated.h"
 
-
 class UAttributeSet;
 class UGameplayEffect;
 class UGameplayAbility;
@@ -16,6 +15,7 @@ class UAnimMontage;
 class UNiagaraSystem;
 class UDebuffNiagaraComponent;
 class UPassiveNiagaraComponent;
+struct FOnDamageSignature;// Delegate는 struct로 간주하나 보다
 
 UCLASS(Abstract)
 class AURA_API AAuraCharacterBase : public ACharacter, public IAbilitySystemInterface, public ICombatInterface
@@ -33,6 +33,8 @@ public:
 	virtual void UnHighlightActor();
 
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	virtual float TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EvenInstigator, AActor* DamageCauser) override;
 
 	class UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
@@ -68,6 +70,8 @@ public:
 	virtual bool IsBeingShocked_Implementation() const override;
 
 	virtual void SetIsBeingShocked_Implementation(bool bInIsBeingShocked) override;
+	
+	virtual FOnDamageSignature& GetOnDamageDelegate() override;
 
 	FOnASCRegistered OnASCRegistered;
 

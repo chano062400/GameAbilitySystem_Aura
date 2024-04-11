@@ -6,6 +6,8 @@
 #include "Interaction/CombatInterface.h"
 #include "AuraAbilityTypes.h"
 #include "AbilitySystem/AuraAbilitySystemGlobals.h"
+#include "AbilitySystem/AuraAbilitySystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
 //Raw Struct라서 Blueprint나 Reflection System 어느 곳에도 노출시키지 않을 것이라서 F 안붙임.
 struct AuraDamagestatics
@@ -101,6 +103,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	}
 
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
+	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
 
 	// GetAggregatedTags() - /** Returns combination of spec and actor tags */
 	const FGameplayTagContainer* SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();
@@ -112,8 +115,6 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	EvaluateParameters.TargetTags = TargetTags;
 
 	//Debuff
-
-	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
 
 	for (TTuple<FGameplayTag, FGameplayTag> Pair : FAuraGameplayTags::Get().DamageTypesToDebuffs)
 	{
@@ -168,8 +169,36 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 		float Resistance = 0.f;
 		ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(ResistanceCaptureDef, EvaluateParameters, Resistance); 
 		Resistance = FMath::Clamp(Resistance, 0.f, 100.f);
-
-		Damage += DamageTypeValue * ((100.f - Resistance) / 100.f);
+		DamageTypeValue *= (100.f - Resistance) / 100.f;
+		
+		if (UAuraAbilitySystemLibrary::IsRadialDamage(EffectContextHandle))
+		{
+			if (TScriptInterface<ICombatInterface> Interface = TScriptInterface<ICombatInterface>(TargetAvatar))
+			{
+				// Lambda Capture [&] - 람다 함수 앞단에 모든(All) 외부 변수를 참조 타입(Reference Type)으로 잡아(Capture) 사용하겠다는 의미.
+				Interface->GetOnDamageDelegate().AddLambda(
+					[&](float DamageAmount)
+					{
+						DamageTypeValue = DamageAmount;
+					}
+				);
+			}
+			UGameplayStatics::ApplyRadialDamageWithFalloff(
+				TargetAvatar,
+				DamageTypeValue,
+				0.f,
+				UAuraAbilitySystemLibrary::GetRadialDamageOrigin(EffectContextHandle),
+				UAuraAbilitySystemLibrary::GetRadialDamageInnerRadius(EffectContextHandle),
+				UAuraAbilitySystemLibrary::GetRadialDamageOuterRadius(EffectContextHandle),
+				1.f,
+				UDamageType::StaticClass(),
+				TArray<AActor*>(),
+				SourceAvatar,
+				nullptr
+			);
+		}
+		
+		Damage += DamageTypeValue;
 	}
 
 	//Target의 BlockChance를 캡처. Block 한다면 Damage는 1/2이 됨.

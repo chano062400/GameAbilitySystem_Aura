@@ -70,6 +70,14 @@ UAbilitySystemComponent* AAuraCharacterBase::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
+float AAuraCharacterBase::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EvenInstigator, AActor* DamageCauser)
+{
+	const float DamageTaken = Super::TakeDamage(Damage, DamageEvent, EvenInstigator, DamageCauser);
+	OnDamageDelegate.Broadcast(DamageTaken);
+	
+	return DamageTaken;
+}
+
 void AAuraCharacterBase::Die(const FVector& DeathImpulse)
 {
 	FDetachmentTransformRules Rule = FDetachmentTransformRules(EDetachmentRule::KeepWorld, true);
@@ -221,6 +229,11 @@ bool AAuraCharacterBase::IsBeingShocked_Implementation() const
 void AAuraCharacterBase::SetIsBeingShocked_Implementation(bool bInIsBeingShocked)
 {
 	bIsBeingShocked = bInIsBeingShocked;
+}
+
+FOnDamageSignature& AAuraCharacterBase::GetOnDamageDelegate()
+{
+	return OnDamageDelegate;
 }
 
 void AAuraCharacterBase::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const
