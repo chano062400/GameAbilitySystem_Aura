@@ -171,6 +171,8 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 		Resistance = FMath::Clamp(Resistance, 0.f, 100.f);
 		DamageTypeValue *= (100.f - Resistance) / 100.f;
 		
+		if (DamageTypeValue <= 0.f) continue;
+
 		if (UAuraAbilitySystemLibrary::IsRadialDamage(EffectContextHandle))
 		{
 			if (TScriptInterface<ICombatInterface> Interface = TScriptInterface<ICombatInterface>(TargetAvatar))

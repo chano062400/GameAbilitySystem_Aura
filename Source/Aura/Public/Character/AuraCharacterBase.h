@@ -15,7 +15,6 @@ class UAnimMontage;
 class UNiagaraSystem;
 class UDebuffNiagaraComponent;
 class UPassiveNiagaraComponent;
-struct FOnDamageSignature;// Delegate는 struct로 간주하나 보다
 
 UCLASS(Abstract)
 class AURA_API AAuraCharacterBase : public ACharacter, public IAbilitySystemInterface, public ICombatInterface
@@ -76,6 +75,8 @@ public:
 	FOnASCRegistered OnASCRegistered;
 
 	FOnDeath OnDeath;
+
+	FOnDamageSignature OnDamageDelegate;
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TArray<FTaggedMontage> AttackMontage;
