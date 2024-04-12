@@ -14,6 +14,10 @@ class AURA_API UAuraBeamSpell : public UAuraDamageGameplayAbility
 
 public:
 
+	virtual FString GetDescription(int32 Level) override;
+
+	virtual FString GetNextLevelDescription(int32 NextLevel) override;
+
 	UFUNCTION(BlueprintCallable)
 	void StoreMouseDataInfo(const FHitResult& MouseHitResult);
 
