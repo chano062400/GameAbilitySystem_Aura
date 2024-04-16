@@ -8,7 +8,6 @@
 
 FString UAuraFireBolt::GetDescription(int32 Level)
 {
-
 	const int32 ScaledDamage = Damage.GetValueAtLevel(Level);
 	const float ManaCost = FMath::Abs(GetManaCost(Level));
 	const float Cooldown = GetCooldown(Level);

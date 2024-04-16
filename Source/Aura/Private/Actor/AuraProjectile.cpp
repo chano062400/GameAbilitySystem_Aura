@@ -57,17 +57,7 @@ void AAuraProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, 
 
 	if (!bHit)
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
-
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation(), FRotator::ZeroRotator);
-
-		if (LoopingSoundComponent && LoopingSoundComponent->IsPlaying())
-		{
-			LoopingSoundComponent->Stop();
-			LoopingSoundComponent->DestroyComponent();
-		}
-
-		bHit = true;
+		OnHit();
 	}
 
 	if (HasAuthority())
@@ -98,23 +88,29 @@ void AAuraProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, 
 
 }
 
+void AAuraProjectile::OnHit()
+{
+	UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
+
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation(), FRotator::ZeroRotator);
+
+	if (LoopingSoundComponent && LoopingSoundComponent->IsPlaying())
+	{
+		LoopingSoundComponent->Stop();
+		LoopingSoundComponent->DestroyComponent();
+	}
+
+	bHit = true;
+}
+
 void AAuraProjectile::Destroyed()
 {
-
-	if (!bHit && !HasAuthority()) // 서버에서 Destory가 클라이언트 OnSphereOverlap이 일어나기 전에 호출 됐을 때.
+	if (LoopingSoundComponent)
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
-
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation(), FRotator::ZeroRotator); \
-
-			if (LoopingSoundComponent && LoopingSoundComponent->IsPlaying())
-			{
-				LoopingSoundComponent->Stop();
-				LoopingSoundComponent->DestroyComponent();
-			}
-
-		bHit = true;
+		LoopingSoundComponent->Stop();
+		LoopingSoundComponent->DestroyComponent();
 	}
+	if (!bHit && !HasAuthority()) OnHit();
 
 	Super::Destroyed();
 
