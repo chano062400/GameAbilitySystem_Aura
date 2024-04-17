@@ -37,6 +37,7 @@ protected:
 	UFUNCTION()
 	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OverlapActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromsweep, const FHitResult& HitResult);
 
+	UFUNCTION(BlueprintCallable)
 	void OnHit();
 
 	virtual void Destroyed() override;
