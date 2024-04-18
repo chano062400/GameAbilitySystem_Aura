@@ -46,14 +46,7 @@ void AAuraProjectile::BeginPlay()
 
 void AAuraProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OverlapActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromsweep, const FHitResult& HitResult)
 {
-	if (DamageEffectParams.SourceAbilitySystemComponent == nullptr) return;
-
-	AActor* SourceAvatarActor = DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
-	// 자기가 날린 Projectile에 피해를 입지 않도록.
-	if (OverlapActor == SourceAvatarActor) return;
-
-	// EffectCauser - Enemy이므로 OverlapActor가 다른 Enemy라면 피해입지 않도록.
-	if (UAuraAbilitySystemLibrary::IsFriend(SourceAvatarActor, OverlapActor)) return;
+	if (!IsValidOverlap(OverlapActor)) return;
 
 	if (!bHit)
 	{
@@ -86,6 +79,20 @@ void AAuraProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, 
 	}
 	else bHit = true;
 
+}
+
+bool AAuraProjectile::IsValidOverlap(AActor* OverlapActor)
+{
+	if (DamageEffectParams.SourceAbilitySystemComponent == nullptr) return false;
+
+	AActor* SourceAvatarActor = DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
+	// 자기가 날린 Projectile에 피해를 입지 않도록.
+	if (OverlapActor == SourceAvatarActor) return false;
+
+	// EffectCauser - Enemy이므로 OverlapActor가 다른 Enemy라면 피해입지 않도록.
+	if (UAuraAbilitySystemLibrary::IsFriend(SourceAvatarActor, OverlapActor)) return false;
+	
+	return true;
 }
 
 void AAuraProjectile::OnHit()

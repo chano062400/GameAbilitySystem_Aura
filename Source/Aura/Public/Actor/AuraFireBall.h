@@ -21,10 +21,14 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<AActor> ReturnToActor = nullptr;
 
+	UPROPERTY(BlueprintReadWrite)
+	FDamageEffectParams ExplosionDamageEffectParams;
+
 protected:
 
 	virtual void BeginPlay() override;
 
 	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OverlapActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromsweep, const FHitResult& HitResult) override;
 
+	virtual void OnHit() override;
 };

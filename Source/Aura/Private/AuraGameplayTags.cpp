@@ -411,5 +411,12 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 		FName("Block.CursorTrace"),
 		FString("Block CursorTracing")
 	);
+		
+	/* GameplayCue */
+
+	GameplayTags.GameplayCue_FireBlast = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("GameplayCue.FireBlast"),
+		FString("FireBlast GameplayCue Tag")
+	);
 
 }
