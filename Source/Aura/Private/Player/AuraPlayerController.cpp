@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Player/AuraPlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
@@ -18,6 +15,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Actor/MagicCircle.h"
 #include "Components/DecalComponent.h"
+#include <Aura/Aura.h>
 
 AAuraPlayerController::AAuraPlayerController()
 {
