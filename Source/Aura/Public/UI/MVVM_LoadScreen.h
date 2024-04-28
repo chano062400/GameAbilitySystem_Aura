@@ -33,6 +33,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SelectSlotButtonPressed(int32 Slot);
 
+	void LoadData();
+
 private:
 
 	UPROPERTY()
