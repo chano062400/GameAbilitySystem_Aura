@@ -4,6 +4,7 @@
 #include "GameFramework/SaveGame.h"
 #include "LoadScreenSaveGame.generated.h"
 
+UENUM(BlueprintType)
 enum ESaveSlotStatus
 {
 	Vacant,

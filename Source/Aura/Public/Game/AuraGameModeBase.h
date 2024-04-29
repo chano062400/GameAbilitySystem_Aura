@@ -8,6 +8,7 @@ class UCharacterClassInfo;
 class UAbilityInfo;
 class UMVVM_LoadSlot;
 class USaveGame;
+class ULoadScreenSaveGame;
 
 /**
  * 

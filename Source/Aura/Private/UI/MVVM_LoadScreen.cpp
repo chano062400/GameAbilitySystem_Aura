@@ -50,7 +50,7 @@ void UMVVM_LoadScreen::LoadData()
 	{
 		if (AAuraGameModeBase* AuraGameMode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(this)))
 		{
-			ULoadScreenSaveGame* SaveGameObject = AuraGameMode->GetSaveSlotData(LoadSlot.Value->GetPlayerName(), LoadSlot.Key);
+			ULoadScreenSaveGame* SaveGameObject = AuraGameMode->GetSaveSlotData(LoadSlot.Value->LoadSlotName, LoadSlot.Key);
 
 			LoadSlot.Value->SetPlayerName(SaveGameObject->PlayerName);
 			LoadSlot.Value->SaveSlotStatus = SaveGameObject->SaveSlotStatus;
