@@ -6,6 +6,8 @@
 
 class UMVVM_LoadSlot;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSlotSelected);
+
 /**
  * 
  */
@@ -34,6 +36,9 @@ public:
 	void SelectSlotButtonPressed(int32 Slot);
 
 	void LoadData();
+
+	UPROPERTY(BlueprintAssignable)
+	FSlotSelected SlotSelected;
 
 private:
 
