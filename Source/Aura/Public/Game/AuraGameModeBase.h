@@ -20,7 +20,15 @@ class AURA_API AAuraGameModeBase : public AGameModeBase
 
 public:
 
-	UPROPERTY(EditDefaultsOnly , Category = "Character Class Defaults")
+	void SaveSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex);
+
+	static void DeleteSlot(const FString& SlotName, int32 SlotIndex);
+
+	ULoadScreenSaveGame* GetSaveSlotData(const FString& SlotName, int32 SlotIndex) const;
+
+	void TravelToMap(UMVVM_LoadSlot* Slot);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Character Class Defaults")
 	TObjectPtr<UCharacterClassInfo> CharacterClassInfo;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AbilityInfo")
@@ -29,7 +37,17 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<USaveGame> LoadScreenSaveGameClass;
 
-	void SaveSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex);
+	UPROPERTY(EditDefaultsOnly)
+	FString DefaultMapName;
 
-	ULoadScreenSaveGame* GetSaveSlotData(const FString& SlotName, int32 SlotIndex) const;
+	UPROPERTY(EditDefaultsOnly)
+	TSoftObjectPtr<UWorld> DefaultMap;
+
+	// TSoftObjectPtr - 실행되기 전까지는 메모리에 로드되지 않음.
+	UPROPERTY(EditDefaultsOnly)
+	TMap<FString, TSoftObjectPtr<UWorld>> Maps;
+
+protected:
+
+	virtual void BeginPlay() override;
 };
