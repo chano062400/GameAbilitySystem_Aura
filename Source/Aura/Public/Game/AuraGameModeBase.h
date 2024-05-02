@@ -28,6 +28,8 @@ public:
 
 	void TravelToMap(UMVVM_LoadSlot* Slot);
 
+	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Character Class Defaults")
 	TObjectPtr<UCharacterClassInfo> CharacterClassInfo;
 
@@ -42,6 +44,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSoftObjectPtr<UWorld> DefaultMap;
+
+	UPROPERTY(EditDefaultsOnly)
+	FName DefaultPlayerStartTag;
 
 	// TSoftObjectPtr - 실행되기 전까지는 메모리에 로드되지 않음.
 	UPROPERTY(EditDefaultsOnly)
