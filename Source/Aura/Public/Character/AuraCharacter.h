@@ -56,6 +56,8 @@ public:
 
 	virtual void HideMagicCircle_Implementation() override;
 
+	virtual void SaveProgress_Implementation(const FName& CheckPointTag) override;
+
 	/* Combat interface */
 
 	virtual int32 GetPlayerLevel_Implementation() override;

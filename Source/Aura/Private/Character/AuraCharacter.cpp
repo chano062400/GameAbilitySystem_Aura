@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Character/AuraCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
@@ -14,6 +11,10 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "AuraGameplayTags.h"
 #include "AbilitySystem/DebuffNiagaraComponent.h"
+#include "Game/AuraGameModeBase.h"
+#include "Kismet/GameplayStatics.h"
+#include "Game/AuraGameInstance.h"
+#include "Game/LoadScreenSaveGame.h"
 
 AAuraCharacter::AAuraCharacter()
 {
@@ -166,6 +167,35 @@ void AAuraCharacter::HideMagicCircle_Implementation()
 	{
 		AuraPlayerController->HideMagicCircle();
 		AuraPlayerController->bShowMouseCursor = true;
+	}
+}
+
+void AAuraCharacter::SaveProgress_Implementation(const FName& CheckPointTag)
+{
+	if (AAuraGameModeBase* AuraGameMode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(this)))
+	{
+		if (UAuraGameInstance* AuraGameInstance = Cast<UAuraGameInstance>(AuraGameMode->GetGameInstance()))
+		{
+			ULoadScreenSaveGame* SaveGameObject = AuraGameMode->GetSaveSlotData(AuraGameInstance->LoadSlotName, AuraGameInstance->LoadSlotIndex);
+			if (SaveGameObject == nullptr) return;
+
+			SaveGameObject->PlayerStartTag = CheckPointTag;
+			
+			if(AAuraPlayerState* PS = Cast<AAuraPlayerState>(GetPlayerState()))
+			{
+				SaveGameObject->PlayerLevel = PS->GetPlayerLevel();
+				SaveGameObject->XP = PS->GetXP();
+				SaveGameObject->SpellPoints = PS->GetSpellPoint();
+				SaveGameObject->AttributePoints = PS->GetAttributePoint();
+			}
+
+			SaveGameObject->Strength = UAuraAttributeSet::GetStrengthAttribute().GetNumericValue(GetAttributeSet());
+			SaveGameObject->Intelligence = UAuraAttributeSet::GetIntelligenceAttribute().GetNumericValue(GetAttributeSet());
+			SaveGameObject->Resilience = UAuraAttributeSet::GetResilienceAttribute().GetNumericValue(GetAttributeSet());
+			SaveGameObject->Vigor = UAuraAttributeSet::GetVigorAttribute().GetNumericValue(GetAttributeSet());
+
+			AuraGameMode->SaveInGameProgressData(SaveGameObject);
+		}
 	}
 }
 

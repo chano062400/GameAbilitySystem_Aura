@@ -1,5 +1,6 @@
 #include "CheckPoint/CheckPoint.h"
 #include "Components/SphereComponent.h"
+#include "Interaction/PlayerInterface.h"
 
 ACheckPoint::ACheckPoint(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -23,8 +24,9 @@ ACheckPoint::ACheckPoint(const FObjectInitializer& ObjectInitializer)
 
 void ACheckPoint::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OverlapActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromsweep, const FHitResult& HitResult)
 {
-	if (OverlapActor->ActorHasTag(FName("Player")))
+	if (OverlapActor->Implements<UPlayerInterface>())
 	{
+		IPlayerInterface::Execute_SaveProgress(OverlapActor, PlayerStartTag);
 		HandleGlowEffect();
 	}
 }
