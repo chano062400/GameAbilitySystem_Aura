@@ -7,6 +7,7 @@
 #include "AuraPlayerState.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerStatChanged, int32 /*StatValue*/);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnLevelChanged, int32 /*StatValue*/, bool /*IsLevelUp*/);
 
 class ULevelUpInfo;
 
@@ -30,11 +31,12 @@ public:
 	
 	FOnPlayerStatChanged OnXPChangedDelegate;
 
-	FOnPlayerStatChanged OnLevelChangedDelegate;
-	
+	FOnLevelChanged OnLevelChangedDelegate;
+
 	FOnPlayerStatChanged OnAttributePointChangedDelegate;
 
 	FOnPlayerStatChanged OnSpellPointChangedDelegate;
+
 
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<ULevelUpInfo> LevelUpInfo;

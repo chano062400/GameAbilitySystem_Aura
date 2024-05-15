@@ -49,7 +49,10 @@ public:
 	TSubclassOf<UGameplayEffect> PrimaryAttributes_SetByCaller;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Common Class Defaults")
-	TSubclassOf<UGameplayEffect> SecondaryAttributes; //공통속성
+	TSubclassOf<UGameplayEffect> SecondaryAttributes; //Enemy
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Common Class Defaults")
+	TSubclassOf<UGameplayEffect> SecondaryAttributes_Infinite; //Aura
 
 	UPROPERTY(EditDefaultsOnly, Category = "Common Class Defaults")
 	TSubclassOf<UGameplayEffect> VitalAttributes;

@@ -13,6 +13,7 @@ class USpellMenuWidgetController;
 struct FWidgetControllerParams;
 class UAbilityInfo;
 struct FDamageEffectParams;
+class ULoadScreenSaveGame;
 
 /**
  * 
@@ -43,6 +44,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category ="AuraAbilitySystemLibrary | CharacterClassDefault")
 	static void InitializeDefaultAttributes(const UObject* WorldContextObject, ECharacterClass CharacterClass, float Level, UAbilitySystemComponent* ASC);
+	
+	UFUNCTION(BlueprintCallable, Category ="AuraAbilitySystemLibrary | CharacterClassDefault")
+	static void InitializeDefaultAttributesFromSaveData(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, ULoadScreenSaveGame* SaveGameObject);
 
 	UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary | CharacterClassDefault")
 	static void GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, ECharacterClass CharacterClass);
