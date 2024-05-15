@@ -52,8 +52,40 @@ void AAuraCharacter::PossessedBy(AController* NewController) // 서버
 
 	InitAbilityActorInfo();
 
+	LoadProgress();
+
 	AddCharacterAbilities();
 
+}
+
+void AAuraCharacter::LoadProgress()
+{
+	if (AAuraGameModeBase* AuraGameMode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(this)))
+	{
+		if (UAuraGameInstance* AuraGameInstance = Cast<UAuraGameInstance>(AuraGameMode->GetGameInstance()))
+		{
+			ULoadScreenSaveGame* SaveGameObject = AuraGameMode->GetSaveSlotData(AuraGameInstance->LoadSlotName, AuraGameInstance->LoadSlotIndex);
+			if (SaveGameObject == nullptr) return;
+
+			if (AAuraPlayerState* PS = Cast<AAuraPlayerState>(GetPlayerState()))
+			{
+				PS->SetLevel(SaveGameObject->PlayerLevel);
+				PS->SetXP(SaveGameObject->XP);
+				PS->SetSpellPoint(SaveGameObject->SpellPoints);
+				PS->SetAttributePoint(SaveGameObject->AttributePoints);
+			}
+
+			if (SaveGameObject->bFirstTimeLoad)
+			{
+				InitializeDefaultAttributes();
+				AddCharacterAbilities();
+			}
+			else
+			{
+
+			}
+		}
+	}
 }
 
 void AAuraCharacter::OnRep_PlayerState() // 클라이언트
@@ -193,6 +225,7 @@ void AAuraCharacter::SaveProgress_Implementation(const FName& CheckPointTag)
 			SaveGameObject->Intelligence = UAuraAttributeSet::GetIntelligenceAttribute().GetNumericValue(GetAttributeSet());
 			SaveGameObject->Resilience = UAuraAttributeSet::GetResilienceAttribute().GetNumericValue(GetAttributeSet());
 			SaveGameObject->Vigor = UAuraAttributeSet::GetVigorAttribute().GetNumericValue(GetAttributeSet());
+			SaveGameObject->bFirstTimeLoad = false;
 
 			AuraGameMode->SaveInGameProgressData(SaveGameObject);
 		}
@@ -273,9 +306,7 @@ void AAuraCharacter::InitAbilityActorInfo()
 		{
 			AuraHUD->InitOverlay(AuraPlayerController, AuraPlayerState, AbilitySystemComponent, AttributeSet);
 		}
-	}
-
-	InitializeDefaultAttributes();
+	};
 }
 
 void AAuraCharacter::MulticastPlayLevelUpEffect_Implementation()

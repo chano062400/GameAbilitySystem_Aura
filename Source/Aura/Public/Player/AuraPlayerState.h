@@ -57,7 +57,11 @@ public:
 
 	void AddToAttributePoint(int32 InAttributePoint);
 
+	void SetAttributePoint(int32 InAttributePoint);
+
 	void AddToSpellPoint(int32 InSpellPoint);
+
+	void SetSpellPoint(int32 InSpellPoint);
 
 protected:
 

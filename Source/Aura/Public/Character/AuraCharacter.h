@@ -73,6 +73,7 @@ public:
 
 protected:
 
+	void LoadProgress();
 
 private:
 	 
