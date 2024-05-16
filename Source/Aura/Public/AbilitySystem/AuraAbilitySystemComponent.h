@@ -18,6 +18,8 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FDeactivatePassiveAbility, const FGameplayTa
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FActivatePassiveEffect, const FGameplayTag& /*Ability Tag*/, bool /*bAcitvate*/);
 
+class ULoadScreenSaveGame;
+
 /**
  * 
  */
@@ -44,6 +46,8 @@ public:
 
 	bool bStartUpAbilitiesGiven = false;
 
+	void AddCharacterAbilitiesFromSaveData(ULoadScreenSaveGame* SaveGameObject);
+
 	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities);
 	
 	void AddCharacterPassiveAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupPassiveAbilities);
@@ -61,6 +65,8 @@ public:
 	static FGameplayTag GetInputTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
 
 	static FGameplayTag GetStatusFromSpec(const FGameplayAbilitySpec& AbilitySpec);
+
+	FGameplayTag GetSlotFromAbilityTag(const FGameplayTag& AbilityTag);
 
 	FGameplayTag GetStautusFromAbilityTag(const FGameplayTag& AbilityTag);
 
