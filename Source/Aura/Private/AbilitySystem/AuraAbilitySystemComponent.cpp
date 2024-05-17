@@ -411,11 +411,12 @@ void UAuraAbilitySystemComponent::ServerEquipAbility_Implementation(const FGamep
 					// Passive Ability이고, 특정 Slot에 장착돼있지 않다면
 					if (IsPassiveAbility(*SpecWithSlot))
 					{
-						// 특정 Slot에 장착돼있던 Passive Ability를 End Ability함.
+						// 특정 Slot에 장착돼있던 Passive Ability를 End Ability하고 Passive Effect도 Deactive.
 						DeactivatePassiveAbility.Broadcast(GetAbilityTagFromSpec(*SpecWithSlot));
 						MulticastActivatePassiveEffect(GetAbilityTagFromSpec(*SpecWithSlot), false);
 					}
 					
+					// 전에 장착했던 AbilitySpec에서 Slot Tag를 삭제.
 					ClearSlot(SpecWithSlot);
 				}
 			}
@@ -430,6 +431,7 @@ void UAuraAbilitySystemComponent::ServerEquipAbility_Implementation(const FGamep
 					MulticastActivatePassiveEffect(AbilityTag, true);
 				}
 
+				// 장착할 것이기 때문에, 전에 있던 StatusTag를 지우고 Equipped Tag로 변경. 
 				AbilitySpec->DynamicAbilityTags.RemoveTag(GetStatusFromSpec(*AbilitySpec));
 				AbilitySpec->DynamicAbilityTags.AddTag(FAuraGameplayTags::Get().Abilities_Status_Equipped);
 			}

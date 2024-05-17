@@ -4,13 +4,16 @@
 #include "Game/LoadScreenSaveGame.h"
 #include "GameFramework/PlayerStart.h"
 #include "Game/AuraGameInstance.h"
+#include "EngineUtils.h"
+#include "Serialization/ObjectAndNameAsStringProxyArchive.h"
+#include "Interaction/SaveInterface.h"
 
 void AAuraGameModeBase::SaveSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex)
 {
 	DeleteSlot(LoadSlot->LoadSlotName, SlotIndex);
-	
+
 	USaveGame* SaveGameObject = UGameplayStatics::CreateSaveGameObject(LoadScreenSaveGameClass);
-	
+
 	ULoadScreenSaveGame* LoadScreenSaveGame = Cast<ULoadScreenSaveGame>(SaveGameObject);
 	LoadScreenSaveGame->PlayerName = LoadSlot->GetPlayerName();
 	LoadScreenSaveGame->SaveSlotStatus = ESaveSlotStatus::Taken;
@@ -84,10 +87,76 @@ void AAuraGameModeBase::SaveInGameProgressData(ULoadScreenSaveGame* SaveGameObje
 	{
 		const FString InGameLoadSlotName = AuraGameInstance->LoadSlotName;
 		const int32 InGameLoadSlotIndex = AuraGameInstance->LoadSlotIndex;
-		
+
 		AuraGameInstance->PlayerStartTag = SaveGameObject->PlayerStartTag;
 		UGameplayStatics::SaveGameToSlot(SaveGameObject, InGameLoadSlotName, InGameLoadSlotIndex);
 	}
+}
+
+void AAuraGameModeBase::SaveWorldState(UWorld* World)
+{
+	// 현재 레벨의 이름만을 가져옴.
+	FString WorldName = World->GetMapName();
+	WorldName.RemoveFromStart(World->StreamingLevelsPrefix);
+
+	if (UAuraGameInstance* AuraGameInstance = Cast<UAuraGameInstance>(GetGameInstance()))
+	{
+		if (ULoadScreenSaveGame* SaveGameObject = GetSaveSlotData(AuraGameInstance->LoadSlotName, AuraGameInstance->LoadSlotIndex))
+		{
+			if (!SaveGameObject->HasMap(WorldName))
+			{
+				FSavedMap NewSavedMap;
+				NewSavedMap.MapAssetName = WorldName;
+				SaveGameObject->SavedMap.Add(NewSavedMap);
+			}
+
+			FSavedMap SavedMap = SaveGameObject->GetSavedMapWithMapName(WorldName);
+			SavedMap.SavedActors.Empty(); // 지우고, 새롭게 다시 저장.
+
+
+			/**
+			 * Actor iterator
+			 * Note that when Playing In Editor, this will find actors only in CurrentWorld
+			 */
+
+			// SavedActor 저장.
+			for (FActorIterator It(World); It; ++It)
+			{
+				AActor* Actor = *It;
+
+				if (!IsValid(Actor) || !Actor->Implements<USaveInterface>()) continue;
+
+				FSavedActor SavedActor;
+				SavedActor.ActorName = Actor->GetFName();
+				SavedActor.Transform = Actor->GetTransform();
+
+				/**
+				* Archive for storing arbitrary data to the specified memory location
+				*/
+				FMemoryWriter MemoryWriter(SavedActor.Bytes);
+
+				// Implements a proxy archive that serializes UObjects and FNames as string data.
+				FObjectAndNameAsStringProxyArchive Archive(MemoryWriter, true);
+				Archive.ArIsSaveGame = true;
+
+				Actor->Serialize(Archive);
+
+				SavedMap.SavedActors.AddUnique(SavedActor);
+			}
+
+			// Map 교체.
+			for (FSavedMap& MapToReplace : SaveGameObject->SavedMap)
+			{
+				if (MapToReplace.MapAssetName == WorldName)
+				{
+					MapToReplace = SavedMap;
+				}
+			}
+
+			UGameplayStatics::SaveGameToSlot(SaveGameObject, AuraGameInstance->LoadSlotName, AuraGameInstance->LoadSlotIndex);
+		}
+	}
+
 }
 
 void AAuraGameModeBase::BeginPlay()

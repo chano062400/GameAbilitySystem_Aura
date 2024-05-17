@@ -16,6 +16,8 @@ void UPassiveNiagaraComponent::BeginPlay()
 	if (UAuraAbilitySystemComponent* AuraASC = Cast<UAuraAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwner())))
 	{
 		AuraASC->ActivatePassiveEffect.AddUObject(this, &UPassiveNiagaraComponent::OnPassiveSpellActivate);
+		
+		// Load Game해서 게임이 시작됐을 때, 장착된 Passive Ability의 Effect를 Activate
 		const bool bStartUpAblitiesActivated = AuraASC->bStartUpAbilitiesGiven;
 		if (bStartUpAblitiesActivated)
 		{

@@ -32,6 +32,8 @@ public:
 
 	void SaveInGameProgressData(ULoadScreenSaveGame* SaveGameObject);
 
+	void SaveWorldState(UWorld* World);
+
 	UPROPERTY(EditDefaultsOnly, Category = "Character Class Defaults")
 	TObjectPtr<UCharacterClassInfo> CharacterClassInfo;
 
