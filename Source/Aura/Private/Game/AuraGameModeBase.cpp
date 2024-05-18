@@ -93,7 +93,7 @@ void AAuraGameModeBase::SaveInGameProgressData(ULoadScreenSaveGame* SaveGameObje
 	}
 }
 
-void AAuraGameModeBase::SaveWorldState(UWorld* World)
+void AAuraGameModeBase::SaveWorldState(UWorld* World) const
 {
 	// 현재 레벨의 이름만을 가져옴.
 	FString WorldName = World->GetMapName();
@@ -157,6 +157,50 @@ void AAuraGameModeBase::SaveWorldState(UWorld* World)
 		}
 	}
 
+}
+
+void AAuraGameModeBase::LoadWorldState(UWorld* World) const
+{
+	FString WorldName = World->GetMapName();
+	WorldName.RemoveFromStart(World->StreamingLevelsPrefix);
+
+	if (UAuraGameInstance* AuraGameInstance = Cast<UAuraGameInstance>(GetGameInstance()))
+	{
+		ULoadScreenSaveGame* SaveGameObject = Cast<ULoadScreenSaveGame>(UGameplayStatics::LoadGameFromSlot(AuraGameInstance->LoadSlotName, AuraGameInstance->LoadSlotIndex));
+		if (SaveGameObject == nullptr) return;
+
+		if (UGameplayStatics::DoesSaveGameExist(AuraGameInstance->LoadSlotName, AuraGameInstance->LoadSlotIndex))
+		{
+			for (FActorIterator It(World); It; ++It)
+			{
+				AActor* Actor = *It;
+
+				if (!Actor->Implements<USaveInterface>()) continue;
+
+				for (FSavedActor SavedActor : SaveGameObject->GetSavedMapWithMapName(WorldName).SavedActors)
+				{
+					if (SavedActor.ActorName == Actor->GetFName())
+					{
+						if (ISaveInterface::Execute_ShouldLoadTransform(Actor))
+						{
+							Actor->SetActorTransform(SavedActor.Transform);
+
+						}
+
+						FMemoryWriter MemoryReader(SavedActor.Bytes);
+
+						FObjectAndNameAsStringProxyArchive Archive(MemoryReader, true);
+						Archive.ArIsSaveGame = true;
+						// DeSerialize - Converts Binary Bytes Back Into Variables. 
+						Actor->Serialize(Archive);
+
+						ISaveInterface::Execute_LoadActor(Actor);
+					}
+				}
+				
+			}
+		}
+	}
 }
 
 void AAuraGameModeBase::BeginPlay()

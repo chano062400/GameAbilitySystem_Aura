@@ -19,6 +19,10 @@ public:
 
 	ACheckPoint(const FObjectInitializer& ObjectInitializer);
 
+	virtual bool ShouldLoadTransform_Implementation() override { return false; };
+
+	virtual void LoadActor_Implementation() override;
+
 	// SaveGame Specifier - Serialize«ÿ¡‹.
 	UPROPERTY(BlueprintReadOnly, SaveGame)
 	bool bReached = false;
