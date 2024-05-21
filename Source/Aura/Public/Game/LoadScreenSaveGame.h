@@ -15,7 +15,7 @@ enum ESaveSlotStatus
 	Taken
 };
 
-USTRUCT(BlueprintType)
+USTRUCT()
 struct FSavedActor
 {
 	GENERATED_BODY()
@@ -36,7 +36,7 @@ inline bool operator==(const FSavedActor& Left, const FSavedActor& Right)
 	return Left.ActorName == Right.ActorName;
 }
 
-USTRUCT(BlueprintType)
+USTRUCT()
 struct FSavedMap
 {
 	GENERATED_BODY()
